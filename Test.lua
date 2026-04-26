@@ -566,6 +566,26 @@ function Library:Init()
                         end
                 end)
         end
+
+        -- New config system: auto-load named config if marker file exists
+        pcall(function()
+                if not Library.Folder or not isfile or not readfile or not isfolder then return end
+                local autoPath = Library.Folder .. "/autoload.txt"
+                if isfile(autoPath) then
+                        local name = readfile(autoPath)
+                        if name and name ~= "" then
+                                local cfgPath = Library.Folder .. "/configs/" .. name .. ".txt"
+                                if isfile(cfgPath) then
+                                        LoadCfg(readfile(cfgPath))
+                                        Library:MakeNotification({
+                                                Name = "Configuration",
+                                                Content = "Auto-loaded config: " .. name,
+                                                Time = 5
+                                        })
+                                end
+                        end
+                end
+        end)
 end
 
 function Library:MakeWindow(WindowConfig)
@@ -588,24 +608,8 @@ function Library:MakeWindow(WindowConfig)
         WindowConfig.ShowIcon = WindowConfig.ShowIcon or false
         WindowConfig.Icon = WindowConfig.Icon or "rbxassetid://8834748103"
         WindowConfig.IntroIcon = WindowConfig.IntroIcon or "rbxassetid://8834748103"
-        WindowConfig.IntroMode = WindowConfig.IntroMode or "Default" -- "Default" | "Minimal" | "Modern"
-        if WindowConfig.SearchEnabled == nil then
-                WindowConfig.SearchEnabled = true
-        end
         Library.Folder = WindowConfig.ConfigFolder
         Library.SaveCfg = WindowConfig.SaveConfig
-
-        -- Search registry: every element created inside any tab is recorded here
-        -- so the global search bar can show / hide elements by name.
-        local SearchRegistry = {}
-        local function RegisterSearchable(Frame, Name, OwnerContainer)
-                if not Frame or not Name then return end
-                table.insert(SearchRegistry, {
-                        Frame = Frame,
-                        Name = tostring(Name):lower(),
-                        Container = OwnerContainer
-                })
-        end
 
         if WindowConfig.SaveConfig then
                 if not isfolder(WindowConfig.ConfigFolder) then
@@ -780,88 +784,6 @@ function Library:MakeWindow(WindowConfig)
 
         MakeDraggable(DragPoint, MainWindow)
 
-        -- ============================================================
-        -- SEARCH BAR
-        -- A global search field above the right content pane that
-        -- filters every element across every tab by its display name.
-        -- ============================================================
-        local SearchBarHeight = WindowConfig.SearchEnabled and 36 or 0
-        local ContentTop = 50 + SearchBarHeight
-
-        local SearchBox -- forward decl so MakeTab can read it
-        if WindowConfig.SearchEnabled then
-                local SearchBarFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
-                        Parent = MainWindow,
-                        Size = UDim2.new(1, -160, 0, 28),
-                        Position = UDim2.new(0, 155, 0, 54),
-                        BackgroundTransparency = 0.4,
-                        Name = "SearchBar"
-                }), {
-                        AddThemeObject(MakeElement("Stroke"), "Stroke"),
-                        AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://3926305904"), {
-                                Size = UDim2.new(0, 14, 0, 14),
-                                Position = UDim2.new(0, 9, 0.5, -7),
-                                ImageRectOffset = Vector2.new(964, 324),
-                                ImageRectSize = Vector2.new(36, 36),
-                                ImageTransparency = 0.3
-                        }), "Text")
-                }), "Second")
-
-                SearchBox = AddFontObject(AddThemeObject(SetProps(Create("TextBox", {
-                        Parent = SearchBarFrame,
-                        Size = UDim2.new(1, -34, 1, 0),
-                        Position = UDim2.new(0, 30, 0, 0),
-                        BackgroundTransparency = 1,
-                        Text = "",
-                        PlaceholderText = "Search functions...",
-                        PlaceholderColor3 = Color3.fromRGB(140, 140, 140),
-                        TextColor3 = Color3.fromRGB(240, 240, 240),
-                        TextSize = 13,
-                        TextXAlignment = Enum.TextXAlignment.Left,
-                        ClearTextOnFocus = false,
-                        Name = "SearchInput"
-                }), {}), "Text"))
-
-                -- Filter logic: hide elements whose name does not contain the query.
-                -- If a tab has any visible match, switch to that tab automatically
-                -- so the user immediately sees the result.
-                local function ApplyFilter()
-                        local query = string.lower(SearchBox.Text or "")
-                        local containerHasMatch = {}
-
-                        for _, entry in ipairs(SearchRegistry) do
-                                local match = (query == "") or (entry.Name:find(query, 1, true) ~= nil)
-                                if entry.Frame and entry.Frame.Parent then
-                                        entry.Frame.Visible = match
-                                end
-                                if match and entry.Container then
-                                        containerHasMatch[entry.Container] = true
-                                end
-                        end
-
-                        if query ~= "" then
-                                -- Find the first ItemContainer that has a match and show it
-                                local firstMatchContainer
-                                for cont, _ in pairs(containerHasMatch) do
-                                        if cont and cont.Parent == MainWindow then
-                                                firstMatchContainer = cont
-                                                break
-                                        end
-                                end
-
-                                if firstMatchContainer then
-                                        for _, child in ipairs(MainWindow:GetChildren()) do
-                                                if child.Name == "ItemContainer" then
-                                                        child.Visible = (child == firstMatchContainer)
-                                                end
-                                        end
-                                end
-                        end
-                end
-
-                SearchBox:GetPropertyChangedSignal("Text"):Connect(ApplyFilter)
-        end
-
         local MobileReopenButton = SetChildren(SetProps(MakeElement("Button"), {
                 Parent = Container,
                 Size = UDim2.new(0, 40, 0, 40),
@@ -951,13 +873,7 @@ function Library:MakeWindow(WindowConfig)
                 game:GetService("Debris"):AddItem(sound, 3)
         end)
 
-        -- ============================================================
-        -- INTRO MODES
-        -- The user can pick one of three intro animations via
-        -- WindowConfig.IntroMode = "Default" | "Minimal" | "Modern"
-        -- ============================================================
-
-        local function LoadSequence_Default()
+        local function LoadSequence()
                 MainWindow.Visible = false
 
                 -- Intro overlay covers everything with max DisplayOrder
@@ -1163,222 +1079,6 @@ function Library:MakeWindow(WindowConfig)
                 IntroScreenGui:Destroy()
         end 
 
-        -- ------------------------------------------------------------
-        -- Intro Mode 2: "Minimal" - quick, clean fade-in of the title
-        -- only, with a single horizontal accent line. Fast and quiet.
-        -- ------------------------------------------------------------
-        local function LoadSequence_Minimal()
-                MainWindow.Visible = false
-
-                local IntroScreenGui = Instance.new("ScreenGui")
-                IntroScreenGui.Name = "XeioaIntroMinimal"
-                IntroScreenGui.DisplayOrder = 2147483647
-                IntroScreenGui.IgnoreGuiInset = true
-                IntroScreenGui.Parent = game:GetService("CoreGui")
-
-                local IntroContainer = Create("Frame", {
-                        Parent = IntroScreenGui,
-                        Size = UDim2.new(1, 0, 1, 0),
-                        BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-                        BorderSizePixel = 0,
-                        BackgroundTransparency = 0
-                })
-
-                local TitleLabel = Create("TextLabel", {
-                        Parent = IntroContainer,
-                        AnchorPoint = Vector2.new(0.5, 0.5),
-                        Position = UDim2.new(0.5, 0, 0.5, -8),
-                        Size = UDim2.new(0, 400, 0, 40),
-                        BackgroundTransparency = 1,
-                        Text = WindowConfig.IntroText or "Xeioa",
-                        TextColor3 = Color3.fromRGB(255, 255, 255),
-                        TextTransparency = 1,
-                        Font = Enum.Font.GothamBlack,
-                        TextSize = 30,
-                        TextXAlignment = Enum.TextXAlignment.Center
-                })
-
-                local AccentLine = Create("Frame", {
-                        Parent = IntroContainer,
-                        AnchorPoint = Vector2.new(0.5, 0.5),
-                        Position = UDim2.new(0.5, 0, 0.5, 18),
-                        Size = UDim2.new(0, 0, 0, 2),
-                        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                        BackgroundTransparency = 0.2,
-                        BorderSizePixel = 0
-                })
-                Create("UICorner", {CornerRadius = UDim.new(1, 0)}).Parent = AccentLine
-
-                TweenService:Create(TitleLabel, TweenInfo.new(0.45, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
-                TweenService:Create(AccentLine, TweenInfo.new(0.55, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 180, 0, 2)}):Play()
-                wait(0.9)
-
-                local SoundService = game:GetService("SoundService")
-                local startSound = Instance.new("Sound")
-                startSound.SoundId = "rbxassetid://106804504297292"
-                startSound.Volume = 1
-                startSound.Parent = SoundService
-                startSound:Play()
-
-                TweenService:Create(TitleLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {TextTransparency = 1}):Play()
-                TweenService:Create(AccentLine, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 2)}):Play()
-                TweenService:Create(IntroContainer, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
-                wait(0.4)
-
-                MainWindow.Visible = true
-                IntroScreenGui:Destroy()
-        end
-
-        -- ------------------------------------------------------------
-        -- Intro Mode 3: "Modern" - typewriter title reveal with a
-        -- spinning ring loader and a soft pulsing glow. More flair.
-        -- ------------------------------------------------------------
-        local function LoadSequence_Modern()
-                MainWindow.Visible = false
-
-                local IntroScreenGui = Instance.new("ScreenGui")
-                IntroScreenGui.Name = "XeioaIntroModern"
-                IntroScreenGui.DisplayOrder = 2147483647
-                IntroScreenGui.IgnoreGuiInset = true
-                IntroScreenGui.Parent = game:GetService("CoreGui")
-
-                local IntroContainer = Create("Frame", {
-                        Parent = IntroScreenGui,
-                        Size = UDim2.new(1, 0, 1, 0),
-                        BackgroundColor3 = Color3.fromRGB(5, 5, 8),
-                        BorderSizePixel = 0,
-                        BackgroundTransparency = 0
-                })
-
-                Create("UIGradient", {
-                        Color = ColorSequence.new({
-                                ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 10, 35)),
-                                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(5, 5, 12)),
-                                ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 25, 40))
-                        }),
-                        Rotation = 45
-                }).Parent = IntroContainer
-
-                -- Pulsing glow behind the loader
-                local Glow = Create("ImageLabel", {
-                        Parent = IntroContainer,
-                        AnchorPoint = Vector2.new(0.5, 0.5),
-                        Position = UDim2.new(0.5, 0, 0.5, -20),
-                        Size = UDim2.new(0, 280, 0, 280),
-                        BackgroundTransparency = 1,
-                        Image = "rbxassetid://5028857084",
-                        ImageColor3 = Color3.fromRGB(140, 90, 255),
-                        ImageTransparency = 0.6,
-                        ScaleType = Enum.ScaleType.Fit
-                })
-
-                -- Spinning ring loader (rotating image)
-                local Ring = Create("ImageLabel", {
-                        Parent = IntroContainer,
-                        AnchorPoint = Vector2.new(0.5, 0.5),
-                        Position = UDim2.new(0.5, 0, 0.5, -20),
-                        Size = UDim2.new(0, 70, 0, 70),
-                        BackgroundTransparency = 1,
-                        Image = "rbxassetid://4965945816",
-                        ImageColor3 = Color3.fromRGB(255, 255, 255),
-                        ImageTransparency = 0.2
-                })
-
-                -- Typewriter title
-                local FullText = WindowConfig.IntroText or "Xeioa"
-                local TitleLabel = Create("TextLabel", {
-                        Parent = IntroContainer,
-                        AnchorPoint = Vector2.new(0.5, 0.5),
-                        Position = UDim2.new(0.5, 0, 0.5, 60),
-                        Size = UDim2.new(0, 400, 0, 32),
-                        BackgroundTransparency = 1,
-                        Text = "",
-                        TextColor3 = Color3.fromRGB(255, 255, 255),
-                        Font = Enum.Font.GothamBlack,
-                        TextSize = 26,
-                        TextXAlignment = Enum.TextXAlignment.Center
-                })
-
-                local Caret = Create("Frame", {
-                        Parent = IntroContainer,
-                        AnchorPoint = Vector2.new(0.5, 0.5),
-                        Position = UDim2.new(0.5, 0, 0.5, 60),
-                        Size = UDim2.new(0, 2, 0, 22),
-                        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                        BackgroundTransparency = 0,
-                        BorderSizePixel = 0
-                })
-
-                -- Spin the ring continuously during the intro
-                local spinning = true
-                task.spawn(function()
-                        local rot = 0
-                        while spinning and Ring and Ring.Parent do
-                                rot = (rot + 6) % 360
-                                Ring.Rotation = rot
-                                RunService.RenderStepped:Wait()
-                        end
-                end)
-
-                -- Pulse the glow
-                task.spawn(function()
-                        while spinning and Glow and Glow.Parent do
-                                TweenService:Create(Glow, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {ImageTransparency = 0.4, Size = UDim2.new(0, 320, 0, 320)}):Play()
-                                wait(0.8)
-                                TweenService:Create(Glow, TweenInfo.new(0.8, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {ImageTransparency = 0.7, Size = UDim2.new(0, 260, 0, 260)}):Play()
-                                wait(0.8)
-                        end
-                end)
-
-                -- Typewriter effect
-                wait(0.3)
-                for i = 1, #FullText do
-                        TitleLabel.Text = string.sub(FullText, 1, i)
-                        local bounds = TitleLabel.TextBounds.X
-                        Caret.Position = UDim2.new(0.5, bounds/2 + 4, 0.5, 60)
-                        wait(0.07)
-                end
-
-                -- Blink caret a couple times
-                for _ = 1, 3 do
-                        Caret.BackgroundTransparency = 1
-                        wait(0.18)
-                        Caret.BackgroundTransparency = 0
-                        wait(0.18)
-                end
-
-                local SoundService = game:GetService("SoundService")
-                local startSound = Instance.new("Sound")
-                startSound.SoundId = "rbxassetid://106804504297292"
-                startSound.Volume = 1
-                startSound.Parent = SoundService
-                startSound:Play()
-
-                spinning = false
-
-                TweenService:Create(TitleLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {TextTransparency = 1}):Play()
-                TweenService:Create(Caret, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
-                TweenService:Create(Ring, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {ImageTransparency = 1, Size = UDim2.new(0, 110, 0, 110)}):Play()
-                TweenService:Create(Glow, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {ImageTransparency = 1}):Play()
-                TweenService:Create(IntroContainer, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
-                wait(0.5)
-
-                MainWindow.Visible = true
-                IntroScreenGui:Destroy()
-        end
-
-        -- Dispatcher: pick the intro by mode name
-        local function LoadSequence()
-                local mode = tostring(WindowConfig.IntroMode or "Default"):lower()
-                if mode == "minimal" then
-                        LoadSequence_Minimal()
-                elseif mode == "modern" then
-                        LoadSequence_Modern()
-                else
-                        LoadSequence_Default()
-                end
-        end
-
         if WindowConfig.IntroEnabled then
                 LoadSequence()
         end     
@@ -1404,7 +1104,7 @@ function Library:MakeWindow(WindowConfig)
                         AddThemeObject(SetProps(MakeElement("Label", TabConfig.Name, 14), {
                                 Size = UDim2.new(1, -35, 1, 0),
                                 Position = UDim2.new(0, 35, 0, 0),
-                                Font = Enum.Font.GothamBlack,
+                                Font = Library.Fonts[Library.SelectedFont] or Library.Font,
                                 TextTransparency = 0.4,
                                 Name = "Title"
                         }), "Text")
@@ -1415,8 +1115,8 @@ function Library:MakeWindow(WindowConfig)
                 end     
 
                 local Container = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 5), {
-                        Size = UDim2.new(1, -150, 1, -ContentTop),
-                        Position = UDim2.new(0, 150, 0, ContentTop),
+                        Size = UDim2.new(1, -150, 1, -50),
+                        Position = UDim2.new(0, 150, 0, 50),
                         Parent = MainWindow,
                         Visible = false,
                         Name = "ItemContainer"
@@ -1433,14 +1133,14 @@ function Library:MakeWindow(WindowConfig)
                         FirstTab = false
                         TabFrame.Ico.ImageTransparency = 0
                         TabFrame.Title.TextTransparency = 0
-                        TabFrame.Title.Font = Enum.Font.GothamBlack
+                        TabFrame.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
                         Container.Visible = true
                 end   
 
                 AddConnection(TabFrame.MouseButton1Click, function()
                         for _, Tab in next, TabHolder:GetChildren() do
                                 if Tab:IsA("TextButton") then
-                                        Tab.Title.Font = Enum.Font.GothamBlack
+                                        Tab.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
                                         TweenService:Create(Tab.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0.4, ImageColor3 = Color3.fromRGB(240, 240, 240)}):Play()
                                         TweenService:Create(Tab.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0.4, TextColor3 = Color3.fromRGB(240, 240, 240)}):Play()
                                 end
@@ -1452,7 +1152,7 @@ function Library:MakeWindow(WindowConfig)
                         end
                         TweenService:Create(TabFrame.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0, ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
                         TweenService:Create(TabFrame.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0, TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-                        TabFrame.Title.Font = Enum.Font.GothamBlack
+                        TabFrame.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
                         Container.Visible = true
                 end)
 
@@ -1487,7 +1187,6 @@ function Library:MakeWindow(WindowConfig)
                                 function LabelFunction:Set(ToChange)
                                         LabelFrame.Content.Text = ToChange
                                 end
-                                RegisterSearchable(LabelFrame, Text, Container)
                                 return LabelFunction
                         end
 
@@ -1527,7 +1226,6 @@ function Library:MakeWindow(WindowConfig)
                                 function ParagraphFunction:Set(ToChange)
                                         ParagraphFrame.Content.Text = ToChange
                                 end
-                                RegisterSearchable(ParagraphFrame, Text, Container)
                                 return ParagraphFunction
                         end   
 
@@ -1600,7 +1298,6 @@ function Library:MakeWindow(WindowConfig)
                                         ButtonFrame.Content.Text = ButtonText
                                 end     
 
-                                RegisterSearchable(ButtonFrame, ButtonConfig.Name, Container)
                                 return Button
                         end   
 
@@ -1748,7 +1445,6 @@ function Library:MakeWindow(WindowConfig)
                                 if ToggleConfig.Flag then
                                         Library.Flags[ToggleConfig.Flag] = Toggle
                                 end     
-                                RegisterSearchable(ToggleFrame, ToggleConfig.Name, Container)
                                 return Toggle
                         end  
 
@@ -1870,7 +1566,6 @@ function Library:MakeWindow(WindowConfig)
                                 if SliderConfig.Flag then                               
                                         Library.Flags[SliderConfig.Flag] = Slider
                                 end
-                                RegisterSearchable(SliderFrame, SliderConfig.Name, Container)
                                 return Slider
                         end  
 
@@ -2062,7 +1757,6 @@ function Library:MakeWindow(WindowConfig)
                                 if DropdownConfig.Flag then                             
                                         Library.Flags[DropdownConfig.Flag] = Dropdown
                                 end
-                                RegisterSearchable(DropdownFrame, DropdownConfig.Name, Container)
                                 return Dropdown
                         end
 
@@ -2324,7 +2018,6 @@ function Library:MakeWindow(WindowConfig)
                                 if DropdownConfig.Flag then
                                         Library.Flags[DropdownConfig.Flag] = MultiDropdown
                                 end
-                                RegisterSearchable(DropdownFrame, DropdownConfig.Name, Container)
                                 return MultiDropdown
                         end
 
@@ -2455,7 +2148,6 @@ function Library:MakeWindow(WindowConfig)
                                 if BindConfig.Flag then                         
                                         Library.Flags[BindConfig.Flag] = Bind
                                 end
-                                RegisterSearchable(BindFrame, BindConfig.Name, Container)
                                 return Bind
                         end  
 
@@ -2470,17 +2162,17 @@ function Library:MakeWindow(WindowConfig)
                                         Size = UDim2.new(1, 0, 1, 0)
                                 })
 
-                                local TextboxActual = AddThemeObject(Create("TextBox", {
+                                local TextboxActual = AddFontObject(AddThemeObject(Create("TextBox", {
                                         Size = UDim2.new(1, 0, 1, 0),
                                         BackgroundTransparency = 1,
                                         TextColor3 = Color3.fromRGB(255, 255, 255),
                                         PlaceholderColor3 = Color3.fromRGB(180,180,180),
                                         PlaceholderText = "Input",
-                                        Font = Enum.Font.GothamSemibold,
+                                        Font = Library.Fonts[Library.SelectedFont] or Library.Font,
                                         TextXAlignment = Enum.TextXAlignment.Center,
                                         TextSize = 14,
                                         ClearTextOnFocus = false
-                                }), "Text")
+                                }), "Text"))
 
                                 local TextContainer = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 6), {
                                         Size = UDim2.new(0, 24, 0, 24),
@@ -2543,7 +2235,6 @@ function Library:MakeWindow(WindowConfig)
                                         sound:Play()
                                         game:GetService("Debris"):AddItem(sound, 3)
                                 end)
-                                RegisterSearchable(TextboxFrame, TextboxConfig.Name, Container)
                         end 
 
                         function ElementFunction:AddColorpicker(ColorpickerConfig)
@@ -2753,7 +2444,6 @@ function Library:MakeWindow(WindowConfig)
                                 if ColorpickerConfig.Flag then                          
                                         Library.Flags[ColorpickerConfig.Flag] = Colorpicker
                                 end
-                                RegisterSearchable(ColorpickerFrame, ColorpickerConfig.Name, Container)
                                 return Colorpicker
                         end
 
@@ -3010,6 +2700,204 @@ function Library:MakeWindow(WindowConfig)
                                 end)
                         end
 
+                        -- Search Bar: filters sibling elements by name (case-insensitive substring)
+                        function ElementFunction:AddSearch(SearchConfig)
+                                SearchConfig = SearchConfig or {}
+                                SearchConfig.Placeholder = SearchConfig.Placeholder or "Search..."
+
+                                local SearchActual = AddFontObject(AddThemeObject(Create("TextBox", {
+                                        Size = UDim2.new(1, -16, 1, 0),
+                                        Position = UDim2.new(0, 8, 0, 0),
+                                        BackgroundTransparency = 1,
+                                        TextColor3 = Color3.fromRGB(255, 255, 255),
+                                        PlaceholderColor3 = Color3.fromRGB(160, 160, 160),
+                                        PlaceholderText = SearchConfig.Placeholder,
+                                        Font = Library.Fonts[Library.SelectedFont] or Library.Font,
+                                        TextXAlignment = Enum.TextXAlignment.Left,
+                                        TextSize = 14,
+                                        ClearTextOnFocus = false,
+                                        Text = ""
+                                }), "Text"))
+
+                                local SearchFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+                                        Size = UDim2.new(1, 0, 0, 32),
+                                        Parent = ItemParent,
+                                        BackgroundTransparency = 0.25,
+                                        LayoutOrder = -9999
+                                }), {
+                                        AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://3926305904"), {
+                                                Size = UDim2.new(0, 16, 0, 16),
+                                                Position = UDim2.new(1, -24, 0.5, 0),
+                                                AnchorPoint = Vector2.new(0, 0.5),
+                                                ImageRectOffset = Vector2.new(964, 324),
+                                                ImageRectSize = Vector2.new(36, 36),
+                                                ImageTransparency = 0.4
+                                        }), "TextDark"),
+                                        AddThemeObject(MakeElement("Stroke"), "Stroke"),
+                                        SearchActual
+                                }), "Second")
+
+                                Create("UIGradient", {
+                                        Color = ColorSequence.new({
+                                                ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 28)),
+                                                ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
+                                        }),
+                                        Rotation = 90
+                                }).Parent = SearchFrame
+
+                                local function getElementText(child)
+                                        for _, lbl in ipairs(child:GetDescendants()) do
+                                                if lbl:IsA("TextLabel") and (lbl.Name == "Content" or lbl.Name == "Title") then
+                                                        return lbl.Text or ""
+                                                end
+                                        end
+                                        return ""
+                                end
+
+                                AddConnection(SearchActual:GetPropertyChangedSignal("Text"), function()
+                                        local query = string.lower(SearchActual.Text or "")
+                                        for _, child in ipairs(ItemParent:GetChildren()) do
+                                                if child ~= SearchFrame and (child:IsA("Frame") or child:IsA("TextButton")) then
+                                                        if query == "" then
+                                                                child.Visible = true
+                                                        else
+                                                                local txt = string.lower(getElementText(child))
+                                                                child.Visible = txt ~= "" and string.find(txt, query, 1, true) ~= nil
+                                                        end
+                                                end
+                                        end
+                                end)
+
+                                local SearchObj = {}
+                                function SearchObj:Set(text)
+                                        SearchActual.Text = text or ""
+                                end
+                                function SearchObj:Clear()
+                                        SearchActual.Text = ""
+                                end
+                                return SearchObj
+                        end
+
+                        -- Config Section: full UI for the new config system (Create / Use / Delete /
+                        -- AutoLoad / Share / Use ID / Save ID) — composes existing elements.
+                        function ElementFunction:AddConfigSection(ConfigSectionConfig)
+                                ConfigSectionConfig = ConfigSectionConfig or {}
+
+                                local currentName = ""
+                                local currentId   = ""
+                                local saveAsName  = ""
+
+                                local nameBox = ElementFunction:AddTextbox({
+                                        Name = "Config Name",
+                                        Default = "",
+                                        TextDisappear = false,
+                                        Callback = function(text) currentName = text end
+                                })
+
+                                ElementFunction:AddButton({
+                                        Name = "Save Current Config",
+                                        Callback = function()
+                                                if currentName == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Enter a config name first.", Time = 4})
+                                                        return
+                                                end
+                                                Library:CreateConfig(currentName)
+                                        end
+                                })
+
+                                ElementFunction:AddButton({
+                                        Name = "Load Config",
+                                        Callback = function()
+                                                if currentName == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Enter a config name first.", Time = 4})
+                                                        return
+                                                end
+                                                Library:UseConfig(currentName)
+                                        end
+                                })
+
+                                ElementFunction:AddButton({
+                                        Name = "Delete Config",
+                                        Callback = function()
+                                                if currentName == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Enter a config name first.", Time = 4})
+                                                        return
+                                                end
+                                                Library:DeleteConfig(currentName)
+                                        end
+                                })
+
+                                ElementFunction:AddButton({
+                                        Name = "Auto-Load This Config",
+                                        Callback = function()
+                                                if currentName == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Enter a config name first.", Time = 4})
+                                                        return
+                                                end
+                                                Library:AutoLoadConfig(currentName)
+                                        end
+                                })
+
+                                ElementFunction:AddButton({
+                                        Name = "Disable Auto-Load",
+                                        Callback = function()
+                                                Library:UnAutoLoadConfig()
+                                        end
+                                })
+
+                                ElementFunction:AddButton({
+                                        Name = "Share Config (copy ID)",
+                                        Callback = function()
+                                                if currentName == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Enter a config name first.", Time = 4})
+                                                        return
+                                                end
+                                                Library:ShareConfigId(currentName)
+                                        end
+                                })
+
+                                ElementFunction:AddTextbox({
+                                        Name = "Config ID",
+                                        Default = "",
+                                        TextDisappear = false,
+                                        Callback = function(text) currentId = text end
+                                })
+
+                                ElementFunction:AddButton({
+                                        Name = "Use Config ID",
+                                        Callback = function()
+                                                if currentId == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Paste a Config ID first.", Time = 4})
+                                                        return
+                                                end
+                                                Library:UseConfigId(currentId)
+                                        end
+                                })
+
+                                ElementFunction:AddTextbox({
+                                        Name = "Save ID As",
+                                        Default = "",
+                                        TextDisappear = false,
+                                        Callback = function(text) saveAsName = text end
+                                })
+
+                                ElementFunction:AddButton({
+                                        Name = "Save Config from ID",
+                                        Callback = function()
+                                                if saveAsName == "" or currentId == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Need both a Config ID and a 'Save As' name.", Time = 4})
+                                                        return
+                                                end
+                                                Library:SaveConfigId(saveAsName, currentId)
+                                        end
+                                })
+
+                                return {
+                                        SetName = function(_, n) currentName = n end,
+                                        SetId   = function(_, i) currentId = i end
+                                }
+                        end
+
                         return ElementFunction  
                 end     
 
@@ -3071,7 +2959,6 @@ function Library:MakeWindow(WindowConfig)
                         for i, v in next, GetElements(SectionFrame.Holder) do
                                 SectionFunction[i] = v 
                         end
-                        RegisterSearchable(SectionFrame, SectionConfig.Name, Container)
                         return SectionFunction
                 end
 
@@ -3232,27 +3119,27 @@ function Library:MakeNotifi(Configs)
                 Rotation = 90
         })
 
-        local TextLabel1 = Create2("TextLabel", Frame2, {
+        local TextLabel1 = AddFontObject(Create2("TextLabel", Frame2, {
                 Size = UDim2.new(1, 0, 0, 25),
-                Font = Configs_HUB.Text_Font,
+                Font = Library.Fonts[Library.SelectedFont] or Library.Font,
                 BackgroundTransparency = 1,
                 Text = Title,
                 TextSize = 20,
                 Position = UDim2.new(0, 20, 0, 5),
                 TextXAlignment = "Left",
                 TextColor3 = Configs_HUB.Cor_Text
-        })
+        }))
 
-        local TextButton = Create2("TextButton", Frame2, {
+        local TextButton = AddFontObject(Create2("TextButton", Frame2, {
                 Text = "X",
-                Font = Configs_HUB.Text_Font,
+                Font = Library.Fonts[Library.SelectedFont] or Library.Font,
                 TextSize = 20,
                 BackgroundTransparency = 1,
                 TextColor3 = Color3.fromRGB(180, 180, 180),
                 Position = UDim2.new(1, -5, 0, 5),
                 AnchorPoint = Vector2.new(1, 0),
                 Size = UDim2.new(0, 25, 0, 25)
-        })
+        }))
         Corner2(TextButton, {CornerRadius = UDim.new(0, 6)})
 
         AddConnection(TextButton.MouseButton1Down, function()
@@ -3264,7 +3151,7 @@ function Library:MakeNotifi(Configs)
                 game:GetService("Debris"):AddItem(sound, 3)
         end)
 
-        local TextLabel2 = Create2("TextLabel", Frame2, {
+        local TextLabel2 = AddFontObject(Create2("TextLabel", Frame2, {
                 Size = UDim2.new(1, -30, 0, 0),
                 Position = UDim2.new(0, 20, 0, TextButton.Size.Y.Offset + 10),
                 TextSize = 15,
@@ -3273,10 +3160,10 @@ function Library:MakeNotifi(Configs)
                 TextYAlignment = "Top",
                 AutomaticSize = "Y",
                 Text = text,
-                Font = Configs_HUB.Text_Font,
+                Font = Library.Fonts[Library.SelectedFont] or Library.Font,
                 BackgroundTransparency = 1,
                 TextWrapped = true
-        })
+        }))
 
         local FrameSize = Create2("Frame", Frame2, {
                 Size = UDim2.new(1, 0, 0, 2),
@@ -3322,6 +3209,327 @@ end
 
 function Library:Destroy()
         Container:Destroy()
+end
+
+-- =====================================================================
+--                          CONFIG SYSTEM
+-- =====================================================================
+-- Stores named configs as JSON files inside Library.Folder/configs/<name>.txt
+-- AutoLoad marker is Library.Folder/autoload.txt (contains the config name)
+-- Share/Use Config IDs are base64-encoded JSON blobs (no server required)
+
+local function _b64_encode(data)
+        local b = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+        return ((data:gsub('.', function(x)
+                local r, byte = '', x:byte()
+                for i = 8, 1, -1 do r = r .. (byte % 2 ^ i - byte % 2 ^ (i - 1) > 0 and '1' or '0') end
+                return r
+        end) .. '0000'):gsub('%d%d%d?%d?%d?%d?', function(x)
+                if (#x < 6) then return '' end
+                local c = 0
+                for i = 1, 6 do c = c + (x:sub(i, i) == '1' and 2 ^ (6 - i) or 0) end
+                return b:sub(c + 1, c + 1)
+        end) .. ({ '', '==', '=' })[#data % 3 + 1])
+end
+
+local function _b64_decode(data)
+        local b = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+        data = string.gsub(data, '[^' .. b .. '=]', '')
+        return (data:gsub('.', function(x)
+                if (x == '=') then return '' end
+                local r, f = '', (b:find(x) - 1)
+                for i = 6, 1, -1 do r = r .. (f % 2 ^ i - f % 2 ^ (i - 1) > 0 and '1' or '0') end
+                return r
+        end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
+                if (#x ~= 8) then return '' end
+                local c = 0
+                for i = 1, 8 do c = c + (x:sub(i, i) == '1' and 2 ^ (8 - i) or 0) end
+                return string.char(c)
+        end))
+end
+
+local function _checkExecutor()
+        if not writefile or not readfile or not isfile or not isfolder or not makefolder then
+                warn("Xeioa Config: executor file functions are not available")
+                return false
+        end
+        if not Library.Folder then
+                warn("Xeioa Config: Library.Folder is not set (call MakeWindow first)")
+                return false
+        end
+        return true
+end
+
+local function _ensureFolders()
+        if not isfolder(Library.Folder) then makefolder(Library.Folder) end
+        if not isfolder(Library.Folder .. "/configs") then makefolder(Library.Folder .. "/configs") end
+end
+
+local function _configPath(name)
+        return Library.Folder .. "/configs/" .. tostring(name) .. ".txt"
+end
+
+local function _serializeFlags()
+        local Data = {}
+        for i, v in pairs(Library.Flags) do
+                if v.Type == "Colorpicker" then
+                        Data[i] = PackColor(v.Value)
+                else
+                        Data[i] = v.Value
+                end
+        end
+        return HttpService:JSONEncode(Data)
+end
+
+-- Save the current state of all flags into a named config
+function Library:CreateConfig(name)
+        if not name or name == "" then
+                warn("Xeioa CreateConfig: name is required")
+                return false
+        end
+        if not _checkExecutor() then return false end
+        local ok, err = pcall(function()
+                _ensureFolders()
+                writefile(_configPath(name), _serializeFlags())
+        end)
+        if not ok then
+                warn("Xeioa CreateConfig error:", err)
+                return false
+        end
+        Library:MakeNotification({
+                Name = "Config Saved",
+                Content = "Config '" .. name .. "' was created.",
+                Time = 4
+        })
+        return true
+end
+
+-- Load a config by name and apply it to the UI
+function Library:UseConfig(name)
+        if not name or name == "" then
+                warn("Xeioa UseConfig: name is required")
+                return false
+        end
+        if not _checkExecutor() then return false end
+        local path = _configPath(name)
+        if not isfile(path) then
+                warn("Xeioa UseConfig: config '" .. name .. "' does not exist")
+                Library:MakeNotification({
+                        Name = "Config Error",
+                        Content = "Config '" .. name .. "' was not found.",
+                        Time = 4
+                })
+                return false
+        end
+        local ok, err = pcall(function()
+                LoadCfg(readfile(path))
+        end)
+        if not ok then
+                warn("Xeioa UseConfig error:", err)
+                return false
+        end
+        Library:MakeNotification({
+                Name = "Config Loaded",
+                Content = "Loaded config '" .. name .. "'.",
+                Time = 4
+        })
+        return true
+end
+
+-- Delete a named config
+function Library:DeleteConfig(name)
+        if not name or name == "" then
+                warn("Xeioa DeleteConfig: name is required")
+                return false
+        end
+        if not _checkExecutor() then return false end
+        local path = _configPath(name)
+        if not isfile(path) then
+                warn("Xeioa DeleteConfig: config '" .. name .. "' does not exist")
+                return false
+        end
+        local ok, err = pcall(function()
+                if delfile then
+                        delfile(path)
+                else
+                        writefile(path, "")
+                end
+                -- If this was the auto-load target, clear it too
+                local autoPath = Library.Folder .. "/autoload.txt"
+                if isfile(autoPath) and readfile(autoPath) == name then
+                        if delfile then delfile(autoPath) else writefile(autoPath, "") end
+                end
+        end)
+        if not ok then
+                warn("Xeioa DeleteConfig error:", err)
+                return false
+        end
+        Library:MakeNotification({
+                Name = "Config Deleted",
+                Content = "Config '" .. name .. "' was removed.",
+                Time = 4
+        })
+        return true
+end
+
+-- Mark a config to be auto-loaded next time Library:Init() runs
+function Library:AutoLoadConfig(name)
+        if not name or name == "" then
+                warn("Xeioa AutoLoadConfig: name is required")
+                return false
+        end
+        if not _checkExecutor() then return false end
+        if not isfile(_configPath(name)) then
+                warn("Xeioa AutoLoadConfig: config '" .. name .. "' does not exist")
+                return false
+        end
+        local ok, err = pcall(function()
+                _ensureFolders()
+                writefile(Library.Folder .. "/autoload.txt", name)
+        end)
+        if not ok then
+                warn("Xeioa AutoLoadConfig error:", err)
+                return false
+        end
+        Library:MakeNotification({
+                Name = "Auto-Load Set",
+                Content = "Config '" .. name .. "' will auto-load on next launch.",
+                Time = 4
+        })
+        return true
+end
+
+-- Remove the auto-load marker
+function Library:UnAutoLoadConfig()
+        if not _checkExecutor() then return false end
+        local autoPath = Library.Folder .. "/autoload.txt"
+        if not isfile(autoPath) then
+                return true
+        end
+        local ok, err = pcall(function()
+                if delfile then
+                        delfile(autoPath)
+                else
+                        writefile(autoPath, "")
+                end
+        end)
+        if not ok then
+                warn("Xeioa UnAutoLoadConfig error:", err)
+                return false
+        end
+        Library:MakeNotification({
+                Name = "Auto-Load Cleared",
+                Content = "Auto-load was disabled.",
+                Time = 4
+        })
+        return true
+end
+
+-- Returns a shareable ID (base64-encoded JSON) for a saved config.
+-- Also copies it to the clipboard if setclipboard is available.
+function Library:ShareConfigId(name)
+        if not name or name == "" then
+                warn("Xeioa ShareConfigId: name is required")
+                return nil
+        end
+        if not _checkExecutor() then return nil end
+        local path = _configPath(name)
+        if not isfile(path) then
+                warn("Xeioa ShareConfigId: config '" .. name .. "' does not exist")
+                return nil
+        end
+        local id
+        local ok, err = pcall(function()
+                local raw = readfile(path)
+                id = _b64_encode(raw)
+                if setclipboard then setclipboard(id) end
+        end)
+        if not ok then
+                warn("Xeioa ShareConfigId error:", err)
+                return nil
+        end
+        Library:MakeNotification({
+                Name = "Config Shared",
+                Content = setclipboard and "Config ID copied to clipboard." or "Config ID generated.",
+                Time = 4
+        })
+        return id
+end
+
+-- Decode a shared config ID and apply it directly (does not save to file)
+function Library:UseConfigId(id)
+        if not id or id == "" then
+                warn("Xeioa UseConfigId: id is required")
+                return false
+        end
+        local ok, err = pcall(function()
+                local raw = _b64_decode(id)
+                LoadCfg(raw)
+        end)
+        if not ok then
+                warn("Xeioa UseConfigId error:", err)
+                Library:MakeNotification({
+                        Name = "Config Error",
+                        Content = "Invalid config ID.",
+                        Time = 4
+                })
+                return false
+        end
+        Library:MakeNotification({
+                Name = "Config Loaded",
+                Content = "Loaded config from shared ID.",
+                Time = 4
+        })
+        return true
+end
+
+-- Decode a shared config ID and save it locally under the given name
+function Library:SaveConfigId(name, id)
+        if not name or name == "" then
+                warn("Xeioa SaveConfigId: name is required")
+                return false
+        end
+        if not id or id == "" then
+                warn("Xeioa SaveConfigId: id is required")
+                return false
+        end
+        if not _checkExecutor() then return false end
+        local ok, err = pcall(function()
+                _ensureFolders()
+                local raw = _b64_decode(id)
+                -- Validate JSON before writing
+                HttpService:JSONDecode(raw)
+                writefile(_configPath(name), raw)
+        end)
+        if not ok then
+                warn("Xeioa SaveConfigId error:", err)
+                Library:MakeNotification({
+                        Name = "Config Error",
+                        Content = "Failed to save config ID.",
+                        Time = 4
+                })
+                return false
+        end
+        Library:MakeNotification({
+                Name = "Config Saved",
+                Content = "Config '" .. name .. "' was saved from ID.",
+                Time = 4
+        })
+        return true
+end
+
+-- Helper: list all saved config names
+function Library:ListConfigs()
+        if not _checkExecutor() then return {} end
+        local list = {}
+        if not listfiles then return list end
+        local ok, files = pcall(listfiles, Library.Folder .. "/configs")
+        if not ok or not files then return list end
+        for _, file in ipairs(files) do
+                local n = file:match("([^/\\]+)%.txt$")
+                if n then table.insert(list, n) end
+        end
+        return list
 end
 
 return Library
