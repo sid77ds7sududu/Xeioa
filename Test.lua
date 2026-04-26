@@ -5,6 +5,7 @@ local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
+
 local Library = {
         Elements = {},
         ThemeObjects = {},
@@ -193,9 +194,11 @@ local Library = {
         SaveCfg = false,
         Font = Enum.Font.Gotham
 }
+
 local function GetIcon(IconName)
         return nil
 end
+
 function Library:CleanupInstance()
         for _, instance in pairs(game:GetService("CoreGui"):GetChildren()) do
                 if instance:IsA("ScreenGui") and
@@ -204,14 +207,18 @@ function Library:CleanupInstance()
                 end
         end
 end
+
 Library:CleanupInstance()
+
 local Container = Instance.new("ScreenGui")
 Container.Name = string.char(math.random(65, 90))..tostring(math.random(100, 999))
 Container.DisplayOrder = 2147483647
 Container.Parent = game:GetService("CoreGui")
+
 function Library:IsRunning()
         return Container and Container.Parent == game:GetService("CoreGui")
 end
+
 local function AddConnection(Signal, Function)
         if (not Library:IsRunning()) then
                 return
@@ -220,14 +227,17 @@ local function AddConnection(Signal, Function)
         table.insert(Library.Connections, SignalConnect)
         return SignalConnect
 end
+
 task.spawn(function()
         while (Library:IsRunning()) do
                 wait()
         end
+
         for _, Connection in next, Library.Connections do
                 Connection:Disconnect()
         end
 end)
+
 local function MakeDraggable(DragPoint, Main)
         pcall(function()
                 local Dragging, DragInput, MousePos, FramePos = false
@@ -236,6 +246,7 @@ local function MakeDraggable(DragPoint, Main)
                                 Dragging = true
                                 MousePos = Input.Position
                                 FramePos = Main.Position
+
                                 Input.Changed:Connect(function()
                                         if Input.UserInputState == Enum.UserInputState.End then
                                                 Dragging = false
@@ -256,6 +267,7 @@ local function MakeDraggable(DragPoint, Main)
                 end)
         end)
 end
+
 local function Create(Name, Properties, Children)
         local Object = Instance.new(Name)
         for i, v in next, Properties or {} do
@@ -266,32 +278,38 @@ local function Create(Name, Properties, Children)
         end
         return Object
 end
+
 local function CreateElement(ElementName, ElementFunction)
         Library.Elements[ElementName] = function(...)
                 return ElementFunction(...)
         end
 end
+
 local function MakeElement(ElementName, ...)
         local NewElement = Library.Elements[ElementName](...)
         return NewElement
 end
+
 local function SetProps(Element, Props)
         table.foreach(Props, function(Property, Value)
                 Element[Property] = Value
         end)
         return Element
 end
+
 local function SetChildren(Element, Children)
         table.foreach(Children, function(_, Child)
                 Child.Parent = Element
         end)
         return Element
 end
+
 local function Round(Number, Factor)
         local Result = math.floor(Number/Factor + (math.sign(Number) * 0.5)) * Factor
         if Result < 0 then Result = Result + Factor end
         return Result
 end
+
 local function ReturnProperty(Object)
         if Object:IsA("Frame") or Object:IsA("TextButton") then
                 return "BackgroundColor3"
@@ -309,6 +327,7 @@ local function ReturnProperty(Object)
                 return "ImageColor3"
         end
 end
+
 local function AddThemeObject(Object, Type)
         if not Library.ThemeObjects[Type] then
                 Library.ThemeObjects[Type] = {}
@@ -317,6 +336,7 @@ local function AddThemeObject(Object, Type)
         Object[ReturnProperty(Object)] = Library.Themes[Library.SelectedTheme][Type]
         return Object
 end
+
 local function SetTheme()
         for Name, Type in pairs(Library.ThemeObjects) do
                 for _, Object in pairs(Type) do
@@ -326,11 +346,13 @@ local function SetTheme()
                 end
         end
 end
+
 local function AddFontObject(Object)
         table.insert(Library.FontObjects, Object)
         Object.Font = Library.Fonts[Library.SelectedFont] or Library.Font
         return Object
 end
+
 local function SetFont()
         local FontEnum = Library.Fonts[Library.SelectedFont] or Library.Font
         for _, Object in pairs(Library.FontObjects) do
@@ -339,6 +361,7 @@ local function SetFont()
                 end)
         end
 end
+
 function Library:SetTheme(ThemeName)
         if not Library.Themes[ThemeName] then
                 warn("Xeioa: Theme '" .. ThemeName .. "' not found")
@@ -347,6 +370,7 @@ function Library:SetTheme(ThemeName)
         Library.SelectedTheme = ThemeName
         SetTheme()
 end
+
 function Library:SetFont(FontName)
         if not Library.Fonts[FontName] then
                 warn("Xeioa: Font '" .. FontName .. "' not found")
@@ -356,12 +380,15 @@ function Library:SetFont(FontName)
         Library.Font = Library.Fonts[FontName]
         SetFont()
 end
+
 local function PackColor(Color)
         return {R = Color.R * 255, G = Color.G * 255, B = Color.B * 255}
 end
+
 local function UnpackColor(Color)
         return Color3.fromRGB(Color.R, Color.G, Color.B)
 end
+
 local function LoadCfg(Config)
         local success, err = pcall(function()
                 local Data = HttpService:JSONDecode(Config)
@@ -379,18 +406,22 @@ local function LoadCfg(Config)
                         end
                 end)
         end)
+        
         if not success then
                 warn("Config Load Error:", err)
         end
 end
+
 local function SaveCfg(Name)
         if not writefile or not makefolder or not isfolder then
                 return false
         end
+        
         local success, err = pcall(function()
                 if not isfolder(Library.Folder) then
                         makefolder(Library.Folder)
                 end
+                
                 local Data = {}
                 for i,v in pairs(Library.Flags) do
                         if v.Save then
@@ -401,16 +432,21 @@ local function SaveCfg(Name)
                                 end
                         end
                 end
+                
                 writefile(Library.Folder .. "/" .. Name .. ".txt", HttpService:JSONEncode(Data))
         end)
+        
         if not success then
                 warn("Config Save Error:", err)
                 return false
         end
+        
         return true
 end
+
 local WhitelistedMouse = {Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2,Enum.UserInputType.MouseButton3,Enum.UserInputType.Touch}
 local BlacklistedKeys = {Enum.KeyCode.Unknown,Enum.KeyCode.W,Enum.KeyCode.A,Enum.KeyCode.S,Enum.KeyCode.D,Enum.KeyCode.Up,Enum.KeyCode.Left,Enum.KeyCode.Down,Enum.KeyCode.Right,Enum.KeyCode.Slash,Enum.KeyCode.Tab,Enum.KeyCode.Backspace,Enum.KeyCode.Escape}
+
 local function CheckKey(Table, Key)
         for _, v in next, Table do
                 if v == Key then
@@ -418,12 +454,14 @@ local function CheckKey(Table, Key)
                 end
         end
 end
+
 CreateElement("Corner", function(Scale, Offset)
         local Corner = Create("UICorner", {
                 CornerRadius = UDim.new(Scale or 0, Offset or 10)
         })
         return Corner
 end)
+
 CreateElement("Stroke", function(Color, Thickness)
         local Stroke = Create("UIStroke", {
                 Color = Color or Color3.fromRGB(255, 255, 255),
@@ -432,6 +470,7 @@ CreateElement("Stroke", function(Color, Thickness)
         })
         return Stroke
 end)
+
 CreateElement("List", function(Scale, Offset)
         local List = Create("UIListLayout", {
                 SortOrder = Enum.SortOrder.LayoutOrder,
@@ -439,6 +478,7 @@ CreateElement("List", function(Scale, Offset)
         })
         return List
 end)
+
 CreateElement("Padding", function(Bottom, Left, Right, Top)
         local Padding = Create("UIPadding", {
                 PaddingBottom = UDim.new(0, Bottom or 4),
@@ -448,12 +488,14 @@ CreateElement("Padding", function(Bottom, Left, Right, Top)
         })
         return Padding
 end)
+
 CreateElement("TFrame", function()
         local TFrame = Create("Frame", {
                 BackgroundTransparency = 1
         })
         return TFrame
 end)
+
 CreateElement("Frame", function(Color)
         local Frame = Create("Frame", {
                 BackgroundColor3 = Color or Color3.fromRGB(255, 255, 255),
@@ -462,6 +504,7 @@ CreateElement("Frame", function(Color)
         })
         return Frame
 end)
+
 CreateElement("RoundFrame", function(Color, Scale, Offset)
         local Frame = Create("Frame", {
                 BackgroundColor3 = Color or Color3.fromRGB(255, 255, 255),
@@ -474,6 +517,7 @@ CreateElement("RoundFrame", function(Color, Scale, Offset)
         })
         return Frame
 end)
+
 CreateElement("Button", function()
         local Button = Create("TextButton", {
                 Text = "",
@@ -483,6 +527,7 @@ CreateElement("Button", function()
         })
         return Button
 end)
+
 CreateElement("ScrollFrame", function(Color, Width)
         local ScrollFrame = Create("ScrollingFrame", {
                 BackgroundTransparency = 1,
@@ -496,17 +541,21 @@ CreateElement("ScrollFrame", function(Color, Width)
         })
         return ScrollFrame
 end)
+
 CreateElement("Image", function(ImageID)
         local ImageNew = Create("ImageLabel", {
                 Image = ImageID,
                 BackgroundTransparency = 1,
                 ImageTransparency = 0.1
         })
+
         if GetIcon(ImageID) ~= nil then
                 ImageNew.Image = GetIcon(ImageID)
         end     
+
         return ImageNew
 end)
+
 CreateElement("ImageButton", function(ImageID)
         local Image = Create("ImageButton", {
                 Image = ImageID,
@@ -515,6 +564,7 @@ CreateElement("ImageButton", function(ImageID)
         })
         return Image
 end)
+
 CreateElement("Label", function(Text, TextSize, Transparency)
         local Label = Create("TextLabel", {
                 Text = Text or "",
@@ -529,6 +579,7 @@ CreateElement("Label", function(Text, TextSize, Transparency)
         AddFontObject(Label)
         return Label
 end)
+
 local NotificationHolder = SetProps(SetChildren(MakeElement("TFrame"), {
         SetProps(MakeElement("List"), {
                 HorizontalAlignment = Enum.HorizontalAlignment.Center,
@@ -542,17 +593,20 @@ local NotificationHolder = SetProps(SetChildren(MakeElement("TFrame"), {
         AnchorPoint = Vector2.new(1, 1),
         Parent = Container
 })
+
 function Library:MakeNotification(NotificationConfig)
         spawn(function()
                 NotificationConfig.Name = NotificationConfig.Name or "Notification"
                 NotificationConfig.Content = NotificationConfig.Content or "Test"
                 NotificationConfig.Image = NotificationConfig.Image or "rbxassetid://4384403532"
                 NotificationConfig.Time = NotificationConfig.Time or 15
+
                 local NotificationParent = SetProps(MakeElement("TFrame"), {
                         Size = UDim2.new(1, 0, 0, 0),
                         AutomaticSize = Enum.AutomaticSize.Y,
                         Parent = NotificationHolder
                 })
+
                 local NotificationFrame = SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(12, 12, 12), 0, 10), {
                         Parent = NotificationParent, 
                         Size = UDim2.new(1, 0, 0, 0),
@@ -597,12 +651,14 @@ function Library:MakeNotification(NotificationConfig)
                 NotificationFrame:Destroy()
         end)
 end
+
 function Library:Init()
         if Library.SaveCfg then
                 if not isfile or not readfile or not isfolder then
                         warn("File functions not available")
                         return
                 end
+                
                 pcall(function()
                         if isfile(Library.Folder .. "/" .. game.GameId .. ".txt") then
                                 LoadCfg(readfile(Library.Folder .. "/" .. game.GameId .. ".txt"))
@@ -614,6 +670,7 @@ function Library:Init()
                         end
                 end)
         end
+
         pcall(function()
                 if not Library.Folder or not isfile or not readfile or not isfolder then return end
                 local autoPath = Library.Folder .. "/autoload.txt"
@@ -633,11 +690,13 @@ function Library:Init()
                 end
         end)
 end
+
 function Library:MakeWindow(WindowConfig)
         local FirstTab = true
         local Minimized = false
         local Loaded = false
         local UIHidden = false
+
         WindowConfig = WindowConfig or {}
         WindowConfig.Name = WindowConfig.Name or "T"
         WindowConfig.ConfigFolder = WindowConfig.ConfigFolder or WindowConfig.Name
@@ -654,20 +713,24 @@ function Library:MakeWindow(WindowConfig)
         WindowConfig.IntroIcon = WindowConfig.IntroIcon or "rbxassetid://8834748103"
         Library.Folder = WindowConfig.ConfigFolder
         Library.SaveCfg = WindowConfig.SaveConfig
+
         if WindowConfig.SaveConfig then
                 if not isfolder(WindowConfig.ConfigFolder) then
                         makefolder(WindowConfig.ConfigFolder)
                 end     
         end
+
         local TabHolder = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 4), {
                 Size = UDim2.new(1, 0, 1, -50)
         }), {
                 MakeElement("List"),
                 MakeElement("Padding", 8, 0, 0, 8)
         }), "Divider")
+
         AddConnection(TabHolder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
                 TabHolder.CanvasSize = UDim2.new(0, 0, 0, TabHolder.UIListLayout.AbsoluteContentSize.Y + 16)
         end)
+
         local CloseBtn = SetChildren(SetProps(MakeElement("Button"), {
                 Size = UDim2.new(0.5, 0, 1, 0),
                 Position = UDim2.new(0.5, 0, 0, 0),
@@ -678,6 +741,7 @@ function Library:MakeWindow(WindowConfig)
                         Size = UDim2.new(0, 18, 0, 18)
                 }), "Text")
         })
+
         local MinimizeBtn = SetChildren(SetProps(MakeElement("Button"), {
                 Size = UDim2.new(0.5, 0, 1, 0),
                 BackgroundTransparency = 1
@@ -688,9 +752,11 @@ function Library:MakeWindow(WindowConfig)
                         Name = "Ico"
                 }), "Text")
         })
+
         local DragPoint = SetProps(MakeElement("TFrame"), {
                 Size = UDim2.new(1, 0, 0, 50)
         })
+
         local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 10), {
                 Size = UDim2.new(0, 150, 1, -50),
                 Position = UDim2.new(0, 0, 0, 50),
@@ -755,17 +821,20 @@ function Library:MakeWindow(WindowConfig)
                         }), "TextDark")
                 }),
         }), "Second")
+
         local WindowName = AddThemeObject(SetProps(MakeElement("Label", WindowConfig.Name, 14), {
                 Size = UDim2.new(1, -30, 2, 0),
                 Position = UDim2.new(0, 25, 0, -24),
                 Font = Enum.Font.GothamBlack,
                 TextSize = 20
         }), "Text")
+
         local WindowTopBarLine = AddThemeObject(SetProps(MakeElement("Frame"), {
                 Size = UDim2.new(1, 0, 0, 1),
                 Position = UDim2.new(0, 0, 1, -1),
                 BackgroundTransparency = 0.4
         }), "Stroke")
+
         local MainWindow = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 10), {
                 Parent = Container,
                 Position = UDim2.new(0.5, -307, 0.5, -172),
@@ -797,6 +866,7 @@ function Library:MakeWindow(WindowConfig)
                 DragPoint,
                 WindowStuff
         }), "Main")
+
         local TopBarGradient = Create("UIGradient", {
                 Color = ColorSequence.new({
                         ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),
@@ -805,6 +875,7 @@ function Library:MakeWindow(WindowConfig)
                 Rotation = 90
         })
         TopBarGradient.Parent = MainWindow.TopBar
+
         if WindowConfig.ShowIcon then
                 WindowName.Position = UDim2.new(0, 50, 0, -24)
                 local WindowIcon = SetProps(MakeElement("Image", WindowConfig.Icon), {
@@ -813,7 +884,9 @@ function Library:MakeWindow(WindowConfig)
                 })
                 WindowIcon.Parent = MainWindow.TopBar
         end     
+
         MakeDraggable(DragPoint, MainWindow)
+
         local MobileReopenButton = SetChildren(SetProps(MakeElement("Button"), {
                 Parent = Container,
                 Size = UDim2.new(0, 40, 0, 40),
@@ -829,6 +902,7 @@ function Library:MakeWindow(WindowConfig)
                 }), "Text"),
                 MakeElement("Corner", 1)
         })
+
         AddConnection(CloseBtn.MouseButton1Up, function()
                 MainWindow.Visible = false
                 if UserInputService.TouchEnabled then
@@ -842,6 +916,7 @@ function Library:MakeWindow(WindowConfig)
                 })
                 WindowConfig.CloseCallback()
         end)
+
         AddConnection(CloseBtn.MouseButton1Down, function()
                 local SoundService = game:GetService("SoundService")
                 local sound = Instance.new("Sound", SoundService)
@@ -850,16 +925,19 @@ function Library:MakeWindow(WindowConfig)
                 sound:Play()
                 game:GetService("Debris"):AddItem(sound, 3)
         end)
+
         AddConnection(UserInputService.InputBegan, function(Input)
                 if Input.KeyCode == Enum.KeyCode.LeftControl and UIHidden == true then
                         MainWindow.Visible = true
                         MobileReopenButton.Visible = false
                 end
         end)
+
         AddConnection(MobileReopenButton.Activated, function()
                 MainWindow.Visible = true
                 MobileReopenButton.Visible = false
         end)
+
         AddConnection(MobileReopenButton.MouseButton1Down, function()
                 local SoundService = game:GetService("SoundService")
                 local sound = Instance.new("Sound", SoundService)
@@ -868,6 +946,7 @@ function Library:MakeWindow(WindowConfig)
                 sound:Play()
                 game:GetService("Debris"):AddItem(sound, 3)
         end)
+
         AddConnection(MinimizeBtn.MouseButton1Up, function()
                 if Minimized then
                         TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 615, 0, 344)}):Play()
@@ -880,12 +959,14 @@ function Library:MakeWindow(WindowConfig)
                         MainWindow.ClipsDescendants = true
                         WindowTopBarLine.Visible = false
                         MinimizeBtn.Ico.Image = "rbxassetid://7072720870"
+
                         TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, WindowName.TextBounds.X + 140, 0, 50)}):Play()
                         wait(0.1)
                         WindowStuff.Visible = false     
                 end
                 Minimized = not Minimized   
         end)
+
         AddConnection(MinimizeBtn.MouseButton1Down, function()
                 local SoundService = game:GetService("SoundService")
                 local sound = Instance.new("Sound", SoundService)
@@ -894,13 +975,16 @@ function Library:MakeWindow(WindowConfig)
                 sound:Play()
                 game:GetService("Debris"):AddItem(sound, 3)
         end)
+
         local function LoadSequence()
                 MainWindow.Visible = false
+
                 local IntroScreenGui = Instance.new("ScreenGui")
                 IntroScreenGui.Name = "XeioaIntro"
                 IntroScreenGui.DisplayOrder = 2147483647
                 IntroScreenGui.IgnoreGuiInset = true
                 IntroScreenGui.Parent = game:GetService("CoreGui")
+
                 local IntroContainer = Create("Frame", {
                         Parent = IntroScreenGui,
                         Size = UDim2.new(1, 0, 1, 0),
@@ -908,6 +992,7 @@ function Library:MakeWindow(WindowConfig)
                         BorderSizePixel = 0,
                         BackgroundTransparency = 0
                 })
+
                 local BgGradient = Create("UIGradient", {
                         Color = ColorSequence.new({
                                 ColorSequenceKeypoint.new(0, Color3.fromRGB(18, 18, 18)),
@@ -917,6 +1002,7 @@ function Library:MakeWindow(WindowConfig)
                         Rotation = 135
                 })
                 BgGradient.Parent = IntroContainer
+
                 local CenterGlow = Create("ImageLabel", {
                         Parent = IntroContainer,
                         AnchorPoint = Vector2.new(0.5, 0.5),
@@ -928,6 +1014,7 @@ function Library:MakeWindow(WindowConfig)
                         ImageTransparency = 0.85,
                         ScaleType = Enum.ScaleType.Fit
                 })
+
                 local TopLine = Create("Frame", {
                         Parent = IntroContainer,
                         Size = UDim2.new(0, 0, 0, 1),
@@ -944,6 +1031,7 @@ function Library:MakeWindow(WindowConfig)
                                 ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 50, 50))
                         })
                 }).Parent = TopLine
+
                 local BottomLine = Create("Frame", {
                         Parent = IntroContainer,
                         Size = UDim2.new(0, 0, 0, 1),
@@ -960,6 +1048,7 @@ function Library:MakeWindow(WindowConfig)
                                 ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 50, 50))
                         })
                 }).Parent = BottomLine
+
                 local LogoFrame = Create("ImageLabel", {
                         Parent = IntroContainer,
                         AnchorPoint = Vector2.new(0.5, 0.5),
@@ -970,6 +1059,7 @@ function Library:MakeWindow(WindowConfig)
                         ImageColor3 = Color3.fromRGB(255, 255, 255),
                         ImageTransparency = 1
                 })
+
                 local TitleLabel = Create("TextLabel", {
                         Parent = IntroContainer,
                         AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1005,6 +1095,7 @@ function Library:MakeWindow(WindowConfig)
                         })
                 }).Parent = TitleBg
                 Create("UICorner", {CornerRadius = UDim.new(0, 4)}).Parent = TitleBg
+
                 local SubLabel = Create("TextLabel", {
                         Parent = IntroContainer,
                         AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1018,6 +1109,7 @@ function Library:MakeWindow(WindowConfig)
                         TextSize = 13,
                         TextXAlignment = Enum.TextXAlignment.Center
                 })
+
                 local BarBg = Create("Frame", {
                         Parent = IntroContainer,
                         AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1028,6 +1120,7 @@ function Library:MakeWindow(WindowConfig)
                         BorderSizePixel = 0
                 })
                 Create("UICorner", {CornerRadius = UDim.new(1, 0)}).Parent = BarBg
+
                 local BarFill = Create("Frame", {
                         Parent = BarBg,
                         Size = UDim2.new(0, 0, 1, 0),
@@ -1042,26 +1135,34 @@ function Library:MakeWindow(WindowConfig)
                                 ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
                         })
                 }).Parent = BarFill
+
                 TweenService:Create(TopLine, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 220, 0, 1)}):Play()
                 TweenService:Create(BottomLine, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 220, 0, 1)}):Play()
                 wait(0.3)
+
                 TweenService:Create(LogoFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {ImageTransparency = 0}):Play()
                 wait(0.2)
+
                 TweenService:Create(TitleLabel, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
                 wait(0.15)
+
                 TweenService:Create(SubLabel, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0.3}):Play()
                 wait(0.1)
+
                 TweenService:Create(BarFill, TweenInfo.new(0.9, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 1, 0)}):Play()
                 wait(1.0)
+
                 SubLabel.Text = "Ready"
                 TweenService:Create(SubLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
                 wait(0.3)
+
                 local SoundService = game:GetService("SoundService")
                 local startSound = Instance.new("Sound")
                 startSound.SoundId = "rbxassetid://106804504297292"
                 startSound.Volume = 1
                 startSound.Parent = SoundService
                 startSound:Play()
+
                 TweenService:Create(TitleLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {TextTransparency = 1}):Play()
                 TweenService:Create(SubLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {TextTransparency = 1}):Play()
                 TweenService:Create(LogoFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {ImageTransparency = 1}):Play()
@@ -1071,70 +1172,22 @@ function Library:MakeWindow(WindowConfig)
                 TweenService:Create(BottomLine, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 1)}):Play()
                 TweenService:Create(IntroContainer, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
                 wait(0.5)
+
                 MainWindow.Visible = true
                 IntroScreenGui:Destroy()
         end 
+
         if WindowConfig.IntroEnabled then
                 LoadSequence()
         end     
+
         local TabFunction = {}
-        local _CapturedGetElements = nil
-        function TabFunction:AddSidebarSection(SectionConfig)
-                SectionConfig = SectionConfig or {}
-                SectionConfig.Name = SectionConfig.Name or "Section"
-                local sectionHeight = SectionConfig.Height or 140
-                if not _CapturedGetElements then
-                        local _bootstrap = TabFunction:MakeTab({Name = "__sidebar_bootstrap"})
-                        for _, t in ipairs(TabHolder:GetChildren()) do
-                                if t:IsA("TextButton") and t:FindFirstChild("Title") and t.Title.Text == "__sidebar_bootstrap" then
-                                        t:Destroy()
-                                        break
-                                end
-                        end
-                        for _, c in ipairs(MainWindow:GetChildren()) do
-                                if c.Name == "ItemContainer" and c.Visible == false then
-                                        c:Destroy()
-                                end
-                        end
-                end
-                local Holder = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 4), {
-                        Size = UDim2.new(1, 0, 0, sectionHeight),
-                        Position = UDim2.new(0, 0, 0, 0),
-                        Parent = WindowStuff,
-                        Name = "SidebarSection_" .. SectionConfig.Name
-                }), {
-                        MakeElement("List", 0, 6),
-                        MakeElement("Padding", 8, 8, 8, 8)
-                }), "Divider")
-                local Header = AddThemeObject(SetProps(MakeElement("Label", SectionConfig.Name, 13), {
-                        Size = UDim2.new(1, -16, 0, 18),
-                        Position = UDim2.new(0, 8, 0, 4),
-                        Parent = WindowStuff,
-                        Font = Enum.Font.FredokaOne,
-                        TextXAlignment = Enum.TextXAlignment.Left
-                }), "TextDark")
-                local headerOffset = 22
-                Holder.Position = UDim2.new(0, 0, 0, headerOffset)
-                AddConnection(Holder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
-                        Holder.CanvasSize = UDim2.new(0, 0, 0, Holder.UIListLayout.AbsoluteContentSize.Y + 16)
-                end)
-                local divider = AddThemeObject(SetProps(MakeElement("Frame"), {
-                        Size = UDim2.new(1, -16, 0, 1),
-                        Position = UDim2.new(0, 8, 0, headerOffset + sectionHeight + 2),
-                        Parent = WindowStuff,
-                        BackgroundTransparency = 0.4
-                }), "Stroke")
-                local totalTop = headerOffset + sectionHeight + 8
-                TabHolder.Position = UDim2.new(0, 0, 0, totalTop)
-                TabHolder.Size = UDim2.new(1, 0, 1, -50 - totalTop)
-                local elements = _CapturedGetElements(Holder)
-                return elements
-        end
         function TabFunction:MakeTab(TabConfig)
                 TabConfig = TabConfig or {}
                 TabConfig.Name = TabConfig.Name or "Tab"
                 TabConfig.Icon = TabConfig.Icon or ""
                 TabConfig.PremiumOnly = TabConfig.PremiumOnly or false
+
                 local TabFrame = SetChildren(SetProps(MakeElement("Button"), {
                         Size = UDim2.new(1, 0, 0, 30),
                         Parent = TabHolder
@@ -1154,9 +1207,11 @@ function Library:MakeWindow(WindowConfig)
                                 Name = "Title"
                         }), "Text")
                 })
+
                 if GetIcon(TabConfig.Icon) ~= nil then
                         TabFrame.Ico.Image = GetIcon(TabConfig.Icon)
                 end     
+
                 local Container = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 5), {
                         Size = UDim2.new(1, -150, 1, -50),
                         Position = UDim2.new(0, 150, 0, 50),
@@ -1167,9 +1222,11 @@ function Library:MakeWindow(WindowConfig)
                         MakeElement("List", 0, 6),
                         MakeElement("Padding", 15, 10, 10, 15)
                 }), "Divider")
+
                 AddConnection(Container.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
                         Container.CanvasSize = UDim2.new(0, 0, 0, Container.UIListLayout.AbsoluteContentSize.Y + 30)
                 end)
+
                 if FirstTab then
                         FirstTab = false
                         TabFrame.Ico.ImageTransparency = 0
@@ -1177,6 +1234,7 @@ function Library:MakeWindow(WindowConfig)
                         TabFrame.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
                         Container.Visible = true
                 end   
+
                 AddConnection(TabFrame.MouseButton1Click, function()
                         for _, Tab in next, TabHolder:GetChildren() do
                                 if Tab:IsA("TextButton") then
@@ -1195,6 +1253,7 @@ function Library:MakeWindow(WindowConfig)
                         TabFrame.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
                         Container.Visible = true
                 end)
+
                 AddConnection(TabFrame.MouseButton1Down, function()
                         local SoundService = game:GetService("SoundService")
                         local sound = Instance.new("Sound", SoundService)
@@ -1203,11 +1262,10 @@ function Library:MakeWindow(WindowConfig)
                         sound:Play()
                         game:GetService("Debris"):AddItem(sound, 3)
                 end)
+
                 local function GetElements(ItemParent)
                         local ElementFunction = {}
-                        if not _CapturedGetElements then
-                                _CapturedGetElements = function(ip) return GetElements(ip) end
-                        end
+
                         function ElementFunction:AddLabel(Text)
                                 local LabelFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 30),
@@ -1222,15 +1280,18 @@ function Library:MakeWindow(WindowConfig)
                                         }), "Text"),
                                         AddThemeObject(MakeElement("Stroke"), "Stroke")
                                 }), "Second")
+
                                 local LabelFunction = {}
                                 function LabelFunction:Set(ToChange)
                                         LabelFrame.Content.Text = ToChange
                                 end
                                 return LabelFunction
                         end
+
                         function ElementFunction:AddParagraph(Text, Content)
                                 Text = Text or "Text"
                                 Content = Content or "Content"
+
                                 local ParagraphFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 30),
                                         BackgroundTransparency = 0.8,
@@ -1251,26 +1312,33 @@ function Library:MakeWindow(WindowConfig)
                                         }), "TextDark"),
                                         AddThemeObject(MakeElement("Stroke"), "Stroke")
                                 }), "Second")
+
                                 AddConnection(ParagraphFrame.Content:GetPropertyChangedSignal("Text"), function()
                                         ParagraphFrame.Content.Size = UDim2.new(1, -24, 0, ParagraphFrame.Content.TextBounds.Y)
                                         ParagraphFrame.Size = UDim2.new(1, 0, 0, ParagraphFrame.Content.TextBounds.Y + 35)
                                 end)
+
                                 ParagraphFrame.Content.Text = Content
+
                                 local ParagraphFunction = {}
                                 function ParagraphFunction:Set(ToChange)
                                         ParagraphFrame.Content.Text = ToChange
                                 end
                                 return ParagraphFunction
                         end   
+
                         function ElementFunction:AddButton(ButtonConfig)
                                 ButtonConfig = ButtonConfig or {}
                                 ButtonConfig.Name = ButtonConfig.Name or "Button"
                                 ButtonConfig.Callback = ButtonConfig.Callback or function() end
                                 ButtonConfig.Icon = ButtonConfig.Icon or "rbxassetid://3944703587"
+
                                 local Button = {}
+
                                 local Click = SetProps(MakeElement("Button"), {
                                         Size = UDim2.new(1, 0, 1, 0)
                                 })
+
                                 local ButtonFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 33),
                                         Parent = ItemParent,
@@ -1289,6 +1357,7 @@ function Library:MakeWindow(WindowConfig)
                                         AddThemeObject(MakeElement("Stroke"), "Stroke"),
                                         Click
                                 }), "Second")
+
                                 Create("UIGradient", {
                                         Color = ColorSequence.new({
                                                 ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),
@@ -1296,18 +1365,22 @@ function Library:MakeWindow(WindowConfig)
                                         }),
                                         Rotation = 90
                                 }).Parent = ButtonFrame
+
                                 AddConnection(Click.MouseEnter, function()
                                         TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.15}):Play()
                                 end)
+
                                 AddConnection(Click.MouseLeave, function()
                                         TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.25}):Play()
                                 end)
+
                                 AddConnection(Click.MouseButton1Up, function()
                                         TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.15}):Play()
                                         spawn(function()
                                                 ButtonConfig.Callback()
                                         end)
                                 end)
+
                                 AddConnection(Click.MouseButton1Down, function()
                                         TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.05}):Play()
                                         local SoundService = game:GetService("SoundService")
@@ -1317,11 +1390,14 @@ function Library:MakeWindow(WindowConfig)
                                         sound:Play()
                                         game:GetService("Debris"):AddItem(sound, 3)
                                 end)
+
                                 function Button:Set(ButtonText)
                                         ButtonFrame.Content.Text = ButtonText
                                 end     
+
                                 return Button
                         end   
+
                         function ElementFunction:AddToggle(ToggleConfig)
                                 ToggleConfig = ToggleConfig or {}
                                 ToggleConfig.Name = ToggleConfig.Name or "Toggle"
@@ -1329,10 +1405,13 @@ function Library:MakeWindow(WindowConfig)
                                 ToggleConfig.Callback = ToggleConfig.Callback or function() end
                                 ToggleConfig.Flag = ToggleConfig.Flag or nil
                                 ToggleConfig.Save = ToggleConfig.Save or false
+
                                 local Toggle = {Value = ToggleConfig.Default, Type = "Toggle", Save = ToggleConfig.Save}
+
                                 local Click = SetProps(MakeElement("Button"), {
                                         Size = UDim2.new(1, 0, 1, 0)
                                 })
+
                                 local SwitchTrack = Create("Frame", {
                                         Size = UDim2.new(0, 40, 0, 20),
                                         Position = UDim2.new(1, -50, 0.5, 0),
@@ -1346,6 +1425,7 @@ function Library:MakeWindow(WindowConfig)
                                         Thickness = 1,
                                         Transparency = 0.4
                                 }).Parent = SwitchTrack
+
                                 local SwitchGradient = Create("UIGradient", {
                                         Color = ColorSequence.new({
                                                 ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 35, 35)),
@@ -1354,6 +1434,7 @@ function Library:MakeWindow(WindowConfig)
                                         Rotation = 90
                                 })
                                 SwitchGradient.Parent = SwitchTrack
+
                                 local SwitchKnob = Create("Frame", {
                                         Size = UDim2.new(0, 14, 0, 14),
                                         Position = UDim2.new(0, 3, 0.5, 0),
@@ -1370,6 +1451,7 @@ function Library:MakeWindow(WindowConfig)
                                         Rotation = 90
                                 }).Parent = SwitchKnob
                                 SwitchKnob.Parent = SwitchTrack
+
                                 local ToggleFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 38),
                                         Parent = ItemParent,
@@ -1385,6 +1467,7 @@ function Library:MakeWindow(WindowConfig)
                                         SwitchTrack,
                                         Click
                                 }), "Second")
+
                                 Create("UIGradient", {
                                         Color = ColorSequence.new({
                                                 ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 28)),
@@ -1392,6 +1475,7 @@ function Library:MakeWindow(WindowConfig)
                                         }),
                                         Rotation = 90
                                 }).Parent = ToggleFrame
+
                                 function Toggle:Set(Value)
                                         Toggle.Value = Value
                                         if Toggle.Value then
@@ -1421,18 +1505,23 @@ function Library:MakeWindow(WindowConfig)
                                         end
                                         ToggleConfig.Callback(Toggle.Value)
                                 end   
+
                                 Toggle:Set(Toggle.Value)
+
                                 AddConnection(Click.MouseEnter, function()
                                         TweenService:Create(ToggleFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.15}):Play()
                                 end)
+
                                 AddConnection(Click.MouseLeave, function()
                                         TweenService:Create(ToggleFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.25}):Play()
                                 end)
+
                                 AddConnection(Click.MouseButton1Up, function()
                                         TweenService:Create(ToggleFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.15}):Play()
                                         SaveCfg(game.GameId)
                                         Toggle:Set(not Toggle.Value)
                                 end)
+
                                 AddConnection(Click.MouseButton1Down, function()
                                         TweenService:Create(ToggleFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.05}):Play()
                                         local SoundService = game:GetService("SoundService")
@@ -1442,11 +1531,13 @@ function Library:MakeWindow(WindowConfig)
                                         sound:Play()
                                         game:GetService("Debris"):AddItem(sound, 3)
                                 end)
+
                                 if ToggleConfig.Flag then
                                         Library.Flags[ToggleConfig.Flag] = Toggle
                                 end     
                                 return Toggle
                         end  
+
                         function ElementFunction:AddSlider(SliderConfig)
                                 SliderConfig = SliderConfig or {}
                                 SliderConfig.Name = SliderConfig.Name or "Slider"
@@ -1459,8 +1550,10 @@ function Library:MakeWindow(WindowConfig)
                                 SliderConfig.Color = SliderConfig.Color or Color3.fromRGB(220, 220, 220)
                                 SliderConfig.Flag = SliderConfig.Flag or nil
                                 SliderConfig.Save = SliderConfig.Save or false
+
                                 local Slider = {Value = SliderConfig.Default, Type = "Slider", Save = SliderConfig.Save}
                                 local Dragging = false
+
                                 local SliderDrag = SetChildren(SetProps(MakeElement("RoundFrame", SliderConfig.Color, 0, 6), {
                                         Size = UDim2.new(0, 0, 1, 0),
                                         BackgroundTransparency = 0.3,
@@ -1481,6 +1574,7 @@ function Library:MakeWindow(WindowConfig)
                                                 ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
                                         })
                                 }).Parent = SliderDrag
+
                                 local SliderBar = SetChildren(SetProps(MakeElement("RoundFrame", SliderConfig.Color, 0, 6), {
                                         Size = UDim2.new(1, -24, 0, 26),
                                         Position = UDim2.new(0, 12, 0, 30),
@@ -1499,6 +1593,7 @@ function Library:MakeWindow(WindowConfig)
                                         }), "Text"),
                                         SliderDrag
                                 })
+
                                 local SliderFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 65),
                                         Parent = ItemParent,
@@ -1513,6 +1608,7 @@ function Library:MakeWindow(WindowConfig)
                                         AddThemeObject(MakeElement("Stroke"), "Stroke"),
                                         SliderBar
                                 }), "Second")
+
                                 Create("UIGradient", {
                                         Color = ColorSequence.new({
                                                 ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 28)),
@@ -1520,6 +1616,7 @@ function Library:MakeWindow(WindowConfig)
                                         }),
                                         Rotation = 90
                                 }).Parent = SliderFrame
+
                                 SliderBar.InputBegan:Connect(function(Input)
                                         if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then 
                                                 local SoundService = game:GetService("SoundService")
@@ -1536,6 +1633,7 @@ function Library:MakeWindow(WindowConfig)
                                                 Dragging = false 
                                         end 
                                 end)
+
                                 UserInputService.InputChanged:Connect(function(Input)
                                         if Dragging then 
                                                 local SizeScale = math.clamp((Mouse.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1)
@@ -1543,6 +1641,7 @@ function Library:MakeWindow(WindowConfig)
                                                 SaveCfg(game.GameId)
                                         end
                                 end)
+
                                 function Slider:Set(Value)
                                         self.Value = math.clamp(Round(Value, SliderConfig.Increment), SliderConfig.Min, SliderConfig.Max)
                                         TweenService:Create(SliderDrag,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = UDim2.fromScale((self.Value - SliderConfig.Min) / (SliderConfig.Max - SliderConfig.Min), 1)}):Play()
@@ -1550,12 +1649,14 @@ function Library:MakeWindow(WindowConfig)
                                         SliderDrag.Value.Text = tostring(self.Value) .. " " .. SliderConfig.ValueName
                                         SliderConfig.Callback(self.Value)
                                 end    
+
                                 Slider:Set(Slider.Value)
                                 if SliderConfig.Flag then                               
                                         Library.Flags[SliderConfig.Flag] = Slider
                                 end
                                 return Slider
                         end  
+
                         function ElementFunction:AddDropdown(DropdownConfig)
                                 DropdownConfig = DropdownConfig or {}
                                 DropdownConfig.Name = DropdownConfig.Name or "Dropdown"
@@ -1564,12 +1665,16 @@ function Library:MakeWindow(WindowConfig)
                                 DropdownConfig.Callback = DropdownConfig.Callback or function() end
                                 DropdownConfig.Flag = DropdownConfig.Flag or nil
                                 DropdownConfig.Save = DropdownConfig.Save or false
+
                                 local Dropdown = {Value = DropdownConfig.Default, Options = DropdownConfig.Options, Buttons = {}, Toggled = false, Type = "Dropdown", Save = DropdownConfig.Save}
                                 local MaxElements = 5
+
                                 if not table.find(Dropdown.Options, Dropdown.Value) then
                                         Dropdown.Value = "..."
                                 end
+
                                 local DropdownList = MakeElement("List")
+
                                 local DropdownContainer = AddThemeObject(SetProps(SetChildren(MakeElement("ScrollFrame", Color3.fromRGB(40, 40, 40), 4), {
                                         DropdownList
                                 }), {
@@ -1578,9 +1683,11 @@ function Library:MakeWindow(WindowConfig)
                                         Size = UDim2.new(1, 0, 1, -38),
                                         ClipsDescendants = true
                                 }), "Divider")
+
                                 local Click = SetProps(MakeElement("Button"), {
                                         Size = UDim2.new(1, 0, 1, 0)
                                 })
+
                                 local DropdownFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 38),
                                         Parent = ItemParent,
@@ -1624,6 +1731,7 @@ function Library:MakeWindow(WindowConfig)
                                         AddThemeObject(MakeElement("Stroke"), "Stroke"),
                                         MakeElement("Corner")
                                 }), "Second")
+
                                 Create("UIGradient", {
                                         Color = ColorSequence.new({
                                                 ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 28)),
@@ -1631,9 +1739,11 @@ function Library:MakeWindow(WindowConfig)
                                         }),
                                         Rotation = 90
                                 }).Parent = DropdownFrame
+
                                 AddConnection(DropdownList:GetPropertyChangedSignal("AbsoluteContentSize"), function()
                                         DropdownContainer.CanvasSize = UDim2.new(0, 0, 0, DropdownList.AbsoluteContentSize.Y)
                                 end)  
+
                                 local function AddOptions(Options)
                                         for _, Option in pairs(Options) do
                                                 local OptionBtn = AddThemeObject(SetProps(SetChildren(MakeElement("Button", Color3.fromRGB(40, 40, 40)), {
@@ -1649,6 +1759,7 @@ function Library:MakeWindow(WindowConfig)
                                                         BackgroundTransparency = 0.8,
                                                         ClipsDescendants = true
                                                 }), "Divider")
+
                                                 AddConnection(OptionBtn.MouseButton1Click, function()
                                                         local SoundService = game:GetService("SoundService")
                                                         local sound = Instance.new("Sound", SoundService)
@@ -1659,6 +1770,7 @@ function Library:MakeWindow(WindowConfig)
                                                         Dropdown:Set(Option)
                                                         SaveCfg(game.GameId)
                                                 end)
+
                                                 AddConnection(OptionBtn.MouseButton1Down, function()
                                                         local SoundService = game:GetService("SoundService")
                                                         local sound = Instance.new("Sound", SoundService)
@@ -1667,9 +1779,11 @@ function Library:MakeWindow(WindowConfig)
                                                         sound:Play()
                                                         game:GetService("Debris"):AddItem(sound, 3)
                                                 end)
+
                                                 Dropdown.Buttons[Option] = OptionBtn
                                         end
                                 end     
+
                                 function Dropdown:Refresh(Options, Delete)
                                         if Delete then
                                                 for _,v in pairs(Dropdown.Buttons) do
@@ -1681,6 +1795,7 @@ function Library:MakeWindow(WindowConfig)
                                         Dropdown.Options = Options
                                         AddOptions(Dropdown.Options)
                                 end  
+
                                 function Dropdown:Set(Value)
                                         if not table.find(Dropdown.Options, Value) then
                                                 Dropdown.Value = "..."
@@ -1691,8 +1806,10 @@ function Library:MakeWindow(WindowConfig)
                                                 end     
                                                 return
                                         end
+
                                         Dropdown.Value = Value
                                         DropdownFrame.F.Selected.Text = Dropdown.Value
+
                                         for _, v in pairs(Dropdown.Buttons) do
                                                 TweenService:Create(v,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundTransparency = 0.8}):Play()
                                                 TweenService:Create(v.Title,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0.4}):Play()
@@ -1701,6 +1818,7 @@ function Library:MakeWindow(WindowConfig)
                                         TweenService:Create(Dropdown.Buttons[Value].Title,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0}):Play()
                                         return DropdownConfig.Callback(Dropdown.Value)
                                 end
+
                                 AddConnection(Click.MouseButton1Click, function()
                                         Dropdown.Toggled = not Dropdown.Toggled
                                         DropdownFrame.F.Line.Visible = Dropdown.Toggled
@@ -1711,6 +1829,7 @@ function Library:MakeWindow(WindowConfig)
                                                 TweenService:Create(DropdownFrame,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = Dropdown.Toggled and UDim2.new(1, 0, 0, DropdownList.AbsoluteContentSize.Y + 38) or UDim2.new(1, 0, 0, 38)}):Play()
                                         end
                                 end)
+
                                 AddConnection(Click.MouseButton1Down, function()
                                         local SoundService = game:GetService("SoundService")
                                         local sound = Instance.new("Sound", SoundService)
@@ -1719,6 +1838,7 @@ function Library:MakeWindow(WindowConfig)
                                         sound:Play()
                                         game:GetService("Debris"):AddItem(sound, 3)
                                 end)
+
                                 Dropdown:Refresh(Dropdown.Options, false)
                                 Dropdown:Set(Dropdown.Value)
                                 if DropdownConfig.Flag then                             
@@ -1726,6 +1846,7 @@ function Library:MakeWindow(WindowConfig)
                                 end
                                 return Dropdown
                         end
+
                         function ElementFunction:AddMultiDropdown(DropdownConfig)
                                 DropdownConfig = DropdownConfig or {}
                                 DropdownConfig.Name = DropdownConfig.Name or "MultiDropdown"
@@ -1734,6 +1855,7 @@ function Library:MakeWindow(WindowConfig)
                                 DropdownConfig.Callback = DropdownConfig.Callback or function() end
                                 DropdownConfig.Flag = DropdownConfig.Flag or nil
                                 DropdownConfig.Save = DropdownConfig.Save or false
+
                                 local MultiDropdown = {
                                         Value = {},
                                         Options = DropdownConfig.Options,
@@ -1742,13 +1864,17 @@ function Library:MakeWindow(WindowConfig)
                                         Type = "MultiDropdown",
                                         Save = DropdownConfig.Save
                                 }
+
                                 for _, v in pairs(DropdownConfig.Default) do
                                         if table.find(DropdownConfig.Options, v) then
                                                 MultiDropdown.Value[v] = true
                                         end
                                 end
+
                                 local MaxElements = 5
+
                                 local DropdownList = MakeElement("List")
+
                                 local DropdownContainer = AddThemeObject(SetProps(SetChildren(MakeElement("ScrollFrame", Color3.fromRGB(40, 40, 40), 4), {
                                         DropdownList
                                 }), {
@@ -1757,9 +1883,11 @@ function Library:MakeWindow(WindowConfig)
                                         Size = UDim2.new(1, 0, 1, -38),
                                         ClipsDescendants = true
                                 }), "Divider")
+
                                 local Click = SetProps(MakeElement("Button"), {
                                         Size = UDim2.new(1, 0, 1, 0)
                                 })
+
                                 local function GetSelectedText()
                                         local selected = {}
                                         for k, v in pairs(MultiDropdown.Value) do
@@ -1769,6 +1897,7 @@ function Library:MakeWindow(WindowConfig)
                                         if #selected > 2 then return tostring(#selected) .. " selected" end
                                         return table.concat(selected, ", ")
                                 end
+
                                 local DropdownFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 38),
                                         Parent = ItemParent,
@@ -1812,6 +1941,7 @@ function Library:MakeWindow(WindowConfig)
                                         AddThemeObject(MakeElement("Stroke"), "Stroke"),
                                         MakeElement("Corner")
                                 }), "Second")
+
                                 Create("UIGradient", {
                                         Color = ColorSequence.new({
                                                 ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 28)),
@@ -1819,12 +1949,15 @@ function Library:MakeWindow(WindowConfig)
                                         }),
                                         Rotation = 90
                                 }).Parent = DropdownFrame
+
                                 AddConnection(DropdownList:GetPropertyChangedSignal("AbsoluteContentSize"), function()
                                         DropdownContainer.CanvasSize = UDim2.new(0, 0, 0, DropdownList.AbsoluteContentSize.Y)
                                 end)
+
                                 local function RefreshSelectedDisplay()
                                         DropdownFrame.F.Selected.Text = GetSelectedText()
                                 end
+
                                 local function AddOptions(Options)
                                         for _, Option in pairs(Options) do
                                                 local OptionBtn = AddThemeObject(SetProps(SetChildren(MakeElement("Button", Color3.fromRGB(40, 40, 40)), {
@@ -1840,6 +1973,7 @@ function Library:MakeWindow(WindowConfig)
                                                         BackgroundTransparency = 0.8,
                                                         ClipsDescendants = true
                                                 }), "Divider")
+
                                                 local CheckBox = Create("Frame", {
                                                         Size = UDim2.new(0, 14, 0, 14),
                                                         Position = UDim2.new(1, -22, 0.5, 0),
@@ -1854,6 +1988,7 @@ function Library:MakeWindow(WindowConfig)
                                                         Thickness = 1,
                                                         Transparency = 0.3
                                                 }).Parent = CheckBox
+
                                                 local CheckIcon = Create("ImageLabel", {
                                                         Size = UDim2.new(0, 10, 0, 10),
                                                         AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1864,6 +1999,7 @@ function Library:MakeWindow(WindowConfig)
                                                         ImageTransparency = 1,
                                                         Parent = CheckBox
                                                 })
+
                                                 local function UpdateCheck()
                                                         local isSelected = MultiDropdown.Value[Option] == true
                                                         TweenService:Create(CheckBox, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
@@ -1879,7 +2015,9 @@ function Library:MakeWindow(WindowConfig)
                                                                 TextTransparency = isSelected and 0 or 0.4
                                                         }):Play()
                                                 end
+
                                                 UpdateCheck()
+
                                                 AddConnection(OptionBtn.MouseButton1Click, function()
                                                         local SoundService = game:GetService("SoundService")
                                                         local sound = Instance.new("Sound", SoundService)
@@ -1887,12 +2025,14 @@ function Library:MakeWindow(WindowConfig)
                                                         sound.Volume = 1
                                                         sound:Play()
                                                         game:GetService("Debris"):AddItem(sound, 3)
+
                                                         MultiDropdown.Value[Option] = not MultiDropdown.Value[Option]
                                                         UpdateCheck()
                                                         RefreshSelectedDisplay()
                                                         DropdownConfig.Callback(MultiDropdown.Value)
                                                         SaveCfg(game.GameId)
                                                 end)
+
                                                 AddConnection(OptionBtn.MouseButton1Down, function()
                                                         local SoundService = game:GetService("SoundService")
                                                         local sound = Instance.new("Sound", SoundService)
@@ -1901,9 +2041,11 @@ function Library:MakeWindow(WindowConfig)
                                                         sound:Play()
                                                         game:GetService("Debris"):AddItem(sound, 3)
                                                 end)
+
                                                 MultiDropdown.Buttons[Option] = {Btn = OptionBtn, UpdateCheck = UpdateCheck}
                                         end
                                 end
+
                                 function MultiDropdown:Refresh(Options, Delete)
                                         if Delete then
                                                 for _, v in pairs(MultiDropdown.Buttons) do
@@ -1917,6 +2059,7 @@ function Library:MakeWindow(WindowConfig)
                                         AddOptions(MultiDropdown.Options)
                                         RefreshSelectedDisplay()
                                 end
+
                                 function MultiDropdown:Set(Values)
                                         table.clear(MultiDropdown.Value)
                                         for _, v in pairs(Values) do
@@ -1930,6 +2073,7 @@ function Library:MakeWindow(WindowConfig)
                                         RefreshSelectedDisplay()
                                         DropdownConfig.Callback(MultiDropdown.Value)
                                 end
+
                                 AddConnection(Click.MouseButton1Click, function()
                                         MultiDropdown.Toggled = not MultiDropdown.Toggled
                                         DropdownFrame.F.Line.Visible = MultiDropdown.Toggled
@@ -1940,6 +2084,7 @@ function Library:MakeWindow(WindowConfig)
                                                 TweenService:Create(DropdownFrame, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = MultiDropdown.Toggled and UDim2.new(1, 0, 0, DropdownList.AbsoluteContentSize.Y + 38) or UDim2.new(1, 0, 0, 38)}):Play()
                                         end
                                 end)
+
                                 AddConnection(Click.MouseButton1Down, function()
                                         local SoundService = game:GetService("SoundService")
                                         local sound = Instance.new("Sound", SoundService)
@@ -1948,13 +2093,16 @@ function Library:MakeWindow(WindowConfig)
                                         sound:Play()
                                         game:GetService("Debris"):AddItem(sound, 3)
                                 end)
+
                                 MultiDropdown:Refresh(MultiDropdown.Options, false)
                                 RefreshSelectedDisplay()
+
                                 if DropdownConfig.Flag then
                                         Library.Flags[DropdownConfig.Flag] = MultiDropdown
                                 end
                                 return MultiDropdown
                         end
+
                         function ElementFunction:AddBind(BindConfig)
                                 BindConfig.Name = BindConfig.Name or "Bind"
                                 BindConfig.Default = BindConfig.Default or Enum.KeyCode.Unknown
@@ -1962,11 +2110,14 @@ function Library:MakeWindow(WindowConfig)
                                 BindConfig.Callback = BindConfig.Callback or function() end
                                 BindConfig.Flag = BindConfig.Flag or nil
                                 BindConfig.Save = BindConfig.Save or false
+
                                 local Bind = {Value = BindConfig.Default, Binding = false, Type = "Bind", Save = BindConfig.Save}
                                 local Holding = false
+
                                 local Click = SetProps(MakeElement("Button"), {
                                         Size = UDim2.new(1, 0, 1, 0)
                                 })
+
                                 local BindBox = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 6), {
                                         Size = UDim2.new(0, 24, 0, 24),
                                         Position = UDim2.new(1, -12, 0.5, 0),
@@ -1981,6 +2132,7 @@ function Library:MakeWindow(WindowConfig)
                                                 Name = "Value"
                                         }), "Text")
                                 }), "Main")
+
                                 local BindFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 38),
                                         Parent = ItemParent,
@@ -1996,56 +2148,67 @@ function Library:MakeWindow(WindowConfig)
                                         BindBox,
                                         Click
                                 }), "Second")
+
                                 AddConnection(BindBox.Value:GetPropertyChangedSignal("Text"), function()
                                         TweenService:Create(BindBox, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, BindBox.Value.TextBounds.X + 16, 0, 24)}):Play()
                                 end)
+
                                 AddConnection(Click.InputEnded, function(Input)
-                                        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-                                                if Bind.Binding then return end
-                                                Bind.Binding = true
-                                                BindBox.Value.Text = ""
-                                        end
-                                end)
-                                AddConnection(UserInputService.InputBegan, function(Input)
-                                        if UserInputService:GetFocusedTextBox() then return end
-                                        if Input.UserInputType ~= Enum.UserInputType.Keyboard then return end
-                                        if Input.KeyCode.Name == Bind.Value and not Bind.Binding then
-                                                if BindConfig.Hold then
-                                                        Holding = true
-                                                        BindConfig.Callback(Holding)
-                                                else
-                                                        BindConfig.Callback()
-                                                end
-                                        elseif Bind.Binding then
-                                                local Key
-                                                pcall(function()
-                                                        if not CheckKey(BlacklistedKeys, Input.KeyCode) then
-                                                                Key = Input.KeyCode
-                                                        end
-                                                end)
-                                                Key = Key or Bind.Value
-                                                Bind:Set(Key)
-                                                SaveCfg(game.GameId)
-                                        end
-                                end)
-                                AddConnection(UserInputService.InputEnded, function(Input)
-                                        if Input.UserInputType ~= Enum.UserInputType.Keyboard then return end
-                                        if Input.KeyCode.Name == Bind.Value then
-                                                if BindConfig.Hold and Holding then
-                                                        Holding = false
-                                                        BindConfig.Callback(Holding)
-                                                end
-                                        end
-                                end)
-                                AddConnection(Click.MouseEnter, function()
+                                          if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
+                                                  return
+                                          end
+                                          if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                  if Bind.Binding then return end
+                                                  Bind.Binding = true
+                                                  BindBox.Value.Text = ""
+                                          end
+                                  end)
+
+                                  AddConnection(UserInputService.InputBegan, function(Input)
+                                          if UserInputService:GetFocusedTextBox() then return end
+                                          if Input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+                                          if Input.KeyCode.Name == Bind.Value and not Bind.Binding then
+                                                  if BindConfig.Hold then
+                                                          Holding = true
+                                                          BindConfig.Callback(Holding)
+                                                  else
+                                                          BindConfig.Callback()
+                                                  end
+                                          elseif Bind.Binding then
+                                                  local Key
+                                                  pcall(function()
+                                                          if not CheckKey(BlacklistedKeys, Input.KeyCode) then
+                                                                  Key = Input.KeyCode
+                                                          end
+                                                  end)
+                                                  Key = Key or Bind.Value
+                                                  Bind:Set(Key)
+                                                  SaveCfg(game.GameId)
+                                          end
+                                  end)
+
+                                  AddConnection(UserInputService.InputEnded, function(Input)
+                                          if Input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+                                          if Input.KeyCode.Name == Bind.Value then
+                                                  if BindConfig.Hold and Holding then
+                                                          Holding = false
+                                                          BindConfig.Callback(Holding)
+                                                  end
+                                          end
+                                  end)
+
+                                                                  AddConnection(Click.MouseEnter, function()
                                         TweenService:Create(BindFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.15}):Play()
                                 end)
+
                                 AddConnection(Click.MouseLeave, function()
                                         TweenService:Create(BindFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.25}):Play()
                                 end)
+
                                 AddConnection(Click.MouseButton1Up, function()
                                         TweenService:Create(BindFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.15}):Play()
                                 end)
+
                                 AddConnection(Click.MouseButton1Down, function()
                                         TweenService:Create(BindFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.05}):Play()
                                         local SoundService = game:GetService("SoundService")
@@ -2055,27 +2218,32 @@ function Library:MakeWindow(WindowConfig)
                                         sound:Play()
                                         game:GetService("Debris"):AddItem(sound, 3)
                                 end)
+
                                 function Bind:Set(Key)
                                         Bind.Binding = false
                                         Bind.Value = Key or Bind.Value
                                         Bind.Value = Bind.Value.Name or Bind.Value
                                         BindBox.Value.Text = Bind.Value
                                 end
+
                                 Bind:Set(BindConfig.Default)
                                 if BindConfig.Flag then                         
                                         Library.Flags[BindConfig.Flag] = Bind
                                 end
                                 return Bind
                         end  
+
                         function ElementFunction:AddTextbox(TextboxConfig)
                                 TextboxConfig = TextboxConfig or {}
                                 TextboxConfig.Name = TextboxConfig.Name or "Textbox"
                                 TextboxConfig.Default = TextboxConfig.Default or ""
                                 TextboxConfig.TextDisappear = TextboxConfig.TextDisappear or false
                                 TextboxConfig.Callback = TextboxConfig.Callback or function() end
+
                                 local Click = SetProps(MakeElement("Button"), {
                                         Size = UDim2.new(1, 0, 1, 0)
                                 })
+
                                 local TextboxActual = AddFontObject(AddThemeObject(Create("TextBox", {
                                         Size = UDim2.new(1, 0, 1, 0),
                                         BackgroundTransparency = 1,
@@ -2087,6 +2255,7 @@ function Library:MakeWindow(WindowConfig)
                                         TextSize = 14,
                                         ClearTextOnFocus = false
                                 }), "Text"))
+
                                 local TextContainer = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 6), {
                                         Size = UDim2.new(0, 24, 0, 24),
                                         Position = UDim2.new(1, -12, 0.5, 0),
@@ -2096,6 +2265,7 @@ function Library:MakeWindow(WindowConfig)
                                         AddThemeObject(MakeElement("Stroke"), "Stroke"),
                                         TextboxActual
                                 }), "Main")
+
                                 local TextboxFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 38),
                                         Parent = ItemParent,
@@ -2111,26 +2281,33 @@ function Library:MakeWindow(WindowConfig)
                                         TextContainer,
                                         Click
                                 }), "Second")
+
                                 AddConnection(TextboxActual:GetPropertyChangedSignal("Text"), function()
                                         TweenService:Create(TextContainer, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, TextboxActual.TextBounds.X + 16, 0, 24)}):Play()
                                 end)
+
                                 AddConnection(TextboxActual.FocusLost, function()
                                         TextboxConfig.Callback(TextboxActual.Text)
                                         if TextboxConfig.TextDisappear then
                                                 TextboxActual.Text = ""
                                         end     
                                 end)
+
                                 TextboxActual.Text = TextboxConfig.Default
+
                                 AddConnection(Click.MouseEnter, function()
                                         TweenService:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.15}):Play()
                                 end)
+
                                 AddConnection(Click.MouseLeave, function()
                                         TweenService:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.25}):Play()
                                 end)
+
                                 AddConnection(Click.MouseButton1Up, function()
                                         TweenService:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.15}):Play()
                                         TextboxActual:CaptureFocus()
                                 end)
+
                                 AddConnection(Click.MouseButton1Down, function()
                                         TweenService:Create(TextboxFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.05}):Play()
                                         local SoundService = game:GetService("SoundService")
@@ -2141,6 +2318,7 @@ function Library:MakeWindow(WindowConfig)
                                         game:GetService("Debris"):AddItem(sound, 3)
                                 end)
                         end 
+
                         function ElementFunction:AddColorpicker(ColorpickerConfig)
                                 ColorpickerConfig = ColorpickerConfig or {}
                                 ColorpickerConfig.Name = ColorpickerConfig.Name or "Colorpicker"
@@ -2148,8 +2326,10 @@ function Library:MakeWindow(WindowConfig)
                                 ColorpickerConfig.Callback = ColorpickerConfig.Callback or function() end
                                 ColorpickerConfig.Flag = ColorpickerConfig.Flag or nil
                                 ColorpickerConfig.Save = ColorpickerConfig.Save or false
+
                                 local ColorH, ColorS, ColorV = 1, 1, 1
                                 local Colorpicker = {Value = ColorpickerConfig.Default, Toggled = false, Type = "Colorpicker", Save = ColorpickerConfig.Save}
+
                                 local ColorSelection = Create("ImageLabel", {
                                         Size = UDim2.new(0, 18, 0, 18),
                                         Position = UDim2.new(select(3, Color3.toHSV(Colorpicker.Value))),
@@ -2158,6 +2338,7 @@ function Library:MakeWindow(WindowConfig)
                                         BackgroundTransparency = 1,
                                         Image = "http://www.roblox.com/asset/?id=4805639000"
                                 })
+
                                 local HueSelection = Create("ImageLabel", {
                                         Size = UDim2.new(0, 18, 0, 18),
                                         Position = UDim2.new(0.5, 0, 1 - select(1, Color3.toHSV(Colorpicker.Value))),
@@ -2166,6 +2347,7 @@ function Library:MakeWindow(WindowConfig)
                                         BackgroundTransparency = 1,
                                         Image = "http://www.roblox.com/asset/?id=4805639000"
                                 })
+
                                 local Color = Create("ImageLabel", {
                                         Size = UDim2.new(1, -25, 1, 0),
                                         Visible = false,
@@ -2174,6 +2356,7 @@ function Library:MakeWindow(WindowConfig)
                                         Create("UICorner", {CornerRadius = UDim.new(0, 5)}),
                                         ColorSelection
                                 })
+
                                 local Hue = Create("Frame", {
                                         Size = UDim2.new(0, 20, 1, 0),
                                         Position = UDim2.new(1, -20, 0, 0),
@@ -2183,6 +2366,7 @@ function Library:MakeWindow(WindowConfig)
                                         Create("UICorner", {CornerRadius = UDim.new(0, 5)}),
                                         HueSelection
                                 })
+
                                 local ColorpickerContainer = Create("Frame", {
                                         Position = UDim2.new(0, 0, 0, 32),
                                         Size = UDim2.new(1, 0, 1, -32),
@@ -2198,9 +2382,11 @@ function Library:MakeWindow(WindowConfig)
                                                 PaddingTop = UDim.new(0, 17)
                                         })
                                 })
+
                                 local Click = SetProps(MakeElement("Button"), {
                                         Size = UDim2.new(1, 0, 1, 0)
                                 })
+
                                 local ColorpickerBox = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 6), {
                                         Size = UDim2.new(0, 24, 0, 24),
                                         Position = UDim2.new(1, -12, 0.5, 0),
@@ -2209,6 +2395,7 @@ function Library:MakeWindow(WindowConfig)
                                 }), {
                                         AddThemeObject(MakeElement("Stroke"), "Stroke")
                                 }), "Main")
+
                                 local ColorpickerFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 38),
                                         Parent = ItemParent,
@@ -2238,6 +2425,7 @@ function Library:MakeWindow(WindowConfig)
                                         ColorpickerContainer,
                                         AddThemeObject(MakeElement("Stroke"), "Stroke"),
                                 }), "Second")
+
                                 AddConnection(Click.MouseButton1Click, function()
                                         Colorpicker.Toggled = not Colorpicker.Toggled
                                         TweenService:Create(ColorpickerFrame,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = Colorpicker.Toggled and UDim2.new(1, 0, 0, 148) or UDim2.new(1, 0, 0, 38)}):Play()
@@ -2245,6 +2433,7 @@ function Library:MakeWindow(WindowConfig)
                                         Hue.Visible = Colorpicker.Toggled
                                         ColorpickerFrame.F.Line.Visible = Colorpicker.Toggled
                                 end)
+
                                 AddConnection(Click.MouseButton1Down, function()
                                         local SoundService = game:GetService("SoundService")
                                         local sound = Instance.new("Sound", SoundService)
@@ -2253,6 +2442,7 @@ function Library:MakeWindow(WindowConfig)
                                         sound:Play()
                                         game:GetService("Debris"):AddItem(sound, 3)
                                 end)
+
                                 local function UpdateColorPicker()
                                         ColorpickerBox.BackgroundColor3 = Color3.fromHSV(ColorH, ColorS, ColorV)
                                         Color.BackgroundColor3 = Color3.fromHSV(ColorH, 1, 1)
@@ -2260,9 +2450,11 @@ function Library:MakeWindow(WindowConfig)
                                         ColorpickerConfig.Callback(ColorpickerBox.BackgroundColor3)
                                         SaveCfg(game.GameId)
                                 end
+
                                 ColorH = 1 - (math.clamp(HueSelection.AbsolutePosition.Y - Hue.AbsolutePosition.Y, 0, Hue.AbsoluteSize.Y) / Hue.AbsoluteSize.Y)
                                 ColorS = (math.clamp(ColorSelection.AbsolutePosition.X - Color.AbsolutePosition.X, 0, Color.AbsoluteSize.X) / Color.AbsoluteSize.X)
                                 ColorV = 1 - (math.clamp(ColorSelection.AbsolutePosition.Y - Color.AbsolutePosition.Y, 0, Color.AbsoluteSize.Y) / Color.AbsoluteSize.Y)
+
                                 AddConnection(Color.InputBegan, function(input)
                                         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                                                 local SoundService = game:GetService("SoundService")
@@ -2284,6 +2476,7 @@ function Library:MakeWindow(WindowConfig)
                                                 end)
                                         end
                                 end)
+
                                 AddConnection(Color.InputEnded, function(input)
                                         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                                                 if ColorInput then
@@ -2291,6 +2484,7 @@ function Library:MakeWindow(WindowConfig)
                                                 end
                                         end
                                 end)
+
                                 AddConnection(Hue.InputBegan, function(input)
                                         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                                                 local SoundService = game:GetService("SoundService")
@@ -2302,14 +2496,18 @@ function Library:MakeWindow(WindowConfig)
                                                 if HueInput then
                                                         HueInput:Disconnect()
                                                 end
+
                                                 HueInput = AddConnection(RunService.RenderStepped, function()
                                                         local HueY = (math.clamp(Mouse.Y - Hue.AbsolutePosition.Y, 0, Hue.AbsoluteSize.Y) / Hue.AbsoluteSize.Y)
+
                                                         HueSelection.Position = UDim2.new(0.5, 0, HueY, 0)
                                                         ColorH = 1 - HueY
+
                                                         UpdateColorPicker()
                                                 end)
                                         end
                                 end)
+
                                 AddConnection(Hue.InputEnded, function(input)
                                         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                                                 if HueInput then
@@ -2317,17 +2515,20 @@ function Library:MakeWindow(WindowConfig)
                                                 end
                                         end
                                 end)
+
                                 function Colorpicker:Set(Value)
                                         Colorpicker.Value = Value
                                         ColorpickerBox.BackgroundColor3 = Colorpicker.Value
                                         ColorpickerConfig.Callback(Colorpicker.Value)
                                 end
+
                                 Colorpicker:Set(Colorpicker.Value)
                                 if ColorpickerConfig.Flag then                          
                                         Library.Flags[ColorpickerConfig.Flag] = Colorpicker
                                 end
                                 return Colorpicker
                         end
+
                         function ElementFunction:AddThemePicker()
                                 local ThemeNames = {}
                                 local ThemeColors = {
@@ -2343,6 +2544,7 @@ function Library:MakeWindow(WindowConfig)
                                         table.insert(ThemeNames, name)
                                 end
                                 table.sort(ThemeNames)
+
                                 local PickerFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255,255,255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 60),
                                         Parent = ItemParent,
@@ -2356,6 +2558,7 @@ function Library:MakeWindow(WindowConfig)
                                         }), "Text"),
                                         AddThemeObject(MakeElement("Stroke"), "Stroke")
                                 }), "Second")
+
                                 Create("UIGradient", {
                                         Color = ColorSequence.new({
                                                 ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 28)),
@@ -2363,6 +2566,7 @@ function Library:MakeWindow(WindowConfig)
                                         }),
                                         Rotation = 90
                                 }).Parent = PickerFrame
+
                                 local ButtonRow = Create("ScrollingFrame", {
                                         Size = UDim2.new(1, -16, 0, 28),
                                         Position = UDim2.new(0, 8, 0, 28),
@@ -2377,9 +2581,11 @@ function Library:MakeWindow(WindowConfig)
                                         Padding = UDim.new(0, 5),
                                         Parent = ButtonRow
                                 })
+
                                 RowLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
                                         ButtonRow.CanvasSize = UDim2.new(0, RowLayout.AbsoluteContentSize.X + 8, 0, 0)
                                 end)
+
                                 for _, name in ipairs(ThemeNames) do
                                         local ThemeColor = ThemeColors[name] or Color3.fromRGB(80, 80, 80)
                                         local Btn = Create("TextButton", {
@@ -2397,6 +2603,7 @@ function Library:MakeWindow(WindowConfig)
                                                 Transparency = 0.3,
                                                 Name = "Outline"
                                         }).Parent = Btn
+
                                         local ThemeLabel = Create("TextLabel", {
                                                 Size = UDim2.new(1, 0, 0, 10),
                                                 Position = UDim2.new(0, 0, 1, 2),
@@ -2408,6 +2615,7 @@ function Library:MakeWindow(WindowConfig)
                                                 TextXAlignment = Enum.TextXAlignment.Center,
                                                 Parent = Btn
                                         })
+
                                         Btn.MouseButton1Click:Connect(function()
                                                 for _, child in pairs(ButtonRow:GetChildren()) do
                                                         if child:IsA("TextButton") then
@@ -2426,15 +2634,19 @@ function Library:MakeWindow(WindowConfig)
                                         end)
                                 end
                         end
+
                         function ElementFunction:AddFontPicker()
                                 local FontNames = {}
                                 for name, _ in pairs(Library.Fonts) do
                                         table.insert(FontNames, name)
                                 end
                                 table.sort(FontNames)
+
                                 local FontDropdown = {Toggled = false}
                                 local MaxElements = 5
+
                                 local DropdownList = MakeElement("List")
+
                                 local DropdownContainer = AddThemeObject(SetProps(SetChildren(MakeElement("ScrollFrame", Color3.fromRGB(40, 40, 40), 4), {
                                         DropdownList
                                 }), {
@@ -2443,9 +2655,11 @@ function Library:MakeWindow(WindowConfig)
                                         Size = UDim2.new(1, 0, 1, -38),
                                         ClipsDescendants = true
                                 }), "Divider")
+
                                 local Click = SetProps(MakeElement("Button"), {
                                         Size = UDim2.new(1, 0, 1, 0)
                                 })
+
                                 local DropdownFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 38),
                                         Parent = ItemParent,
@@ -2489,6 +2703,7 @@ function Library:MakeWindow(WindowConfig)
                                         AddThemeObject(MakeElement("Stroke"), "Stroke"),
                                         MakeElement("Corner")
                                 }), "Second")
+
                                 Create("UIGradient", {
                                         Color = ColorSequence.new({
                                                 ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 28)),
@@ -2496,9 +2711,11 @@ function Library:MakeWindow(WindowConfig)
                                         }),
                                         Rotation = 90
                                 }).Parent = DropdownFrame
+
                                 AddConnection(DropdownList:GetPropertyChangedSignal("AbsoluteContentSize"), function()
                                         DropdownContainer.CanvasSize = UDim2.new(0, 0, 0, DropdownList.AbsoluteContentSize.Y)
                                 end)
+
                                 local Buttons = {}
                                 for _, name in ipairs(FontNames) do
                                         local OptionBtn = AddThemeObject(SetProps(SetChildren(MakeElement("Button", Color3.fromRGB(40, 40, 40)), {
@@ -2515,7 +2732,9 @@ function Library:MakeWindow(WindowConfig)
                                                 BackgroundTransparency = Library.SelectedFont == name and 0.3 or 0.8,
                                                 ClipsDescendants = true
                                         }), "Divider")
+
                                         OptionBtn.Title.TextTransparency = Library.SelectedFont == name and 0 or 0.4
+
                                         AddConnection(OptionBtn.MouseButton1Click, function()
                                                 local SoundService = game:GetService("SoundService")
                                                 local sound = Instance.new("Sound", SoundService)
@@ -2523,6 +2742,7 @@ function Library:MakeWindow(WindowConfig)
                                                 sound.Volume = 1
                                                 sound:Play()
                                                 game:GetService("Debris"):AddItem(sound, 3)
+
                                                 for _, v in pairs(Buttons) do
                                                         TweenService:Create(v.btn, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.8}):Play()
                                                         TweenService:Create(v.btn.Title, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {TextTransparency = 0.4}):Play()
@@ -2532,8 +2752,10 @@ function Library:MakeWindow(WindowConfig)
                                                 DropdownFrame.F.Selected.Text = name
                                                 Library:SetFont(name)
                                         end)
+
                                         Buttons[name] = {btn = OptionBtn}
                                 end
+
                                 AddConnection(Click.MouseButton1Click, function()
                                         FontDropdown.Toggled = not FontDropdown.Toggled
                                         DropdownFrame.F.Line.Visible = FontDropdown.Toggled
@@ -2544,6 +2766,7 @@ function Library:MakeWindow(WindowConfig)
                                                 TweenService:Create(DropdownFrame, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = FontDropdown.Toggled and UDim2.new(1, 0, 0, DropdownList.AbsoluteContentSize.Y + 38) or UDim2.new(1, 0, 0, 38)}):Play()
                                         end
                                 end)
+
                                 AddConnection(Click.MouseButton1Down, function()
                                         local SoundService = game:GetService("SoundService")
                                         local sound = Instance.new("Sound", SoundService)
@@ -2553,9 +2776,11 @@ function Library:MakeWindow(WindowConfig)
                                         game:GetService("Debris"):AddItem(sound, 3)
                                 end)
                         end
+
                         function ElementFunction:AddSearch(SearchConfig)
                                 SearchConfig = SearchConfig or {}
                                 SearchConfig.Placeholder = SearchConfig.Placeholder or "Search..."
+
                                 local SearchActual = AddFontObject(AddThemeObject(Create("TextBox", {
                                         Size = UDim2.new(1, -16, 1, 0),
                                         Position = UDim2.new(0, 8, 0, 0),
@@ -2569,6 +2794,7 @@ function Library:MakeWindow(WindowConfig)
                                         ClearTextOnFocus = false,
                                         Text = ""
                                 }), "Text"))
+
                                 local SearchFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
                                         Size = UDim2.new(1, 0, 0, 32),
                                         Parent = ItemParent,
@@ -2586,6 +2812,7 @@ function Library:MakeWindow(WindowConfig)
                                         AddThemeObject(MakeElement("Stroke"), "Stroke"),
                                         SearchActual
                                 }), "Second")
+
                                 Create("UIGradient", {
                                         Color = ColorSequence.new({
                                                 ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 28)),
@@ -2593,6 +2820,7 @@ function Library:MakeWindow(WindowConfig)
                                         }),
                                         Rotation = 90
                                 }).Parent = SearchFrame
+
                                 local function getElementText(child)
                                         for _, lbl in ipairs(child:GetDescendants()) do
                                                 if lbl:IsA("TextLabel") and (lbl.Name == "Content" or lbl.Name == "Title") then
@@ -2601,28 +2829,21 @@ function Library:MakeWindow(WindowConfig)
                                         end
                                         return ""
                                 end
-                                local function processContainer(parent, query)
-                                        for _, child in ipairs(parent:GetChildren()) do
+
+                                AddConnection(SearchActual:GetPropertyChangedSignal("Text"), function()
+                                        local query = string.lower(SearchActual.Text or "")
+                                        for _, child in ipairs(ItemParent:GetChildren()) do
                                                 if child ~= SearchFrame and (child:IsA("Frame") or child:IsA("TextButton")) then
-                                                        local holder = child:FindFirstChild("Holder")
-                                                        if holder then
+                                                        if query == "" then
                                                                 child.Visible = true
-                                                                processContainer(holder, query)
                                                         else
-                                                                if query == "" then
-                                                                        child.Visible = true
-                                                                else
-                                                                        local txt = string.lower(getElementText(child))
-                                                                        child.Visible = txt ~= "" and string.find(txt, query, 1, true) ~= nil
-                                                                end
+                                                                local txt = string.lower(getElementText(child))
+                                                                child.Visible = txt ~= "" and string.find(txt, query, 1, true) ~= nil
                                                         end
                                                 end
                                         end
-                                end
-                                AddConnection(SearchActual:GetPropertyChangedSignal("Text"), function()
-                                        local query = string.lower(SearchActual.Text or "")
-                                        processContainer(ItemParent, query)
                                 end)
+
                                 local SearchObj = {}
                                 function SearchObj:Set(text)
                                         SearchActual.Text = text or ""
@@ -2632,23 +2853,28 @@ function Library:MakeWindow(WindowConfig)
                                 end
                                 return SearchObj
                         end
+
                         function ElementFunction:AddConfigSection(ConfigSectionConfig)
                                 ConfigSectionConfig = ConfigSectionConfig or {}
+
                                 local currentName    = ""
                                 local selectedConfig = ""
                                 local currentId      = ""
                                 local saveAsName     = ""
+
                                 local function getList()
                                         local list = Library:ListConfigs() or {}
                                         if #list == 0 then list = {"(no configs)"} end
                                         return list
                                 end
+
                                 ElementFunction:AddTextbox({
                                         Name = "New Config Name",
                                         Default = "",
                                         TextDisappear = false,
                                         Callback = function(text) currentName = text end
                                 })
+
                                 ElementFunction:AddButton({
                                         Name = "Save Current Config",
                                         Callback = function()
@@ -2662,6 +2888,7 @@ function Library:MakeWindow(WindowConfig)
                                                 end
                                         end
                                 })
+
                                 local configDropdown = ElementFunction:AddDropdown({
                                         Name = "Saved Configs",
                                         Default = "",
@@ -2675,6 +2902,7 @@ function Library:MakeWindow(WindowConfig)
                                         end
                                 })
                                 _G.__XeioaConfigDropdown = configDropdown
+
                                 ElementFunction:AddButton({
                                         Name = "Refresh List",
                                         Callback = function()
@@ -2682,6 +2910,7 @@ function Library:MakeWindow(WindowConfig)
                                                 Library:MakeNotification({Name = "Config", Content = "Config list refreshed.", Time = 3})
                                         end
                                 })
+
                                 ElementFunction:AddButton({
                                         Name = "Load Selected",
                                         Callback = function()
@@ -2692,6 +2921,7 @@ function Library:MakeWindow(WindowConfig)
                                                 Library:UseConfig(selectedConfig)
                                         end
                                 })
+
                                 ElementFunction:AddButton({
                                         Name = "Delete Selected",
                                         Callback = function()
@@ -2704,24 +2934,25 @@ function Library:MakeWindow(WindowConfig)
                                                 configDropdown:Refresh(getList(), true)
                                         end
                                 })
-                                if ConfigSectionConfig.AutoLoad == true then
-                                        ElementFunction:AddButton({
-                                                Name = "Auto-Load Selected",
-                                                Callback = function()
-                                                        if selectedConfig == "" then
-                                                                Library:MakeNotification({Name = "Config", Content = "Pick a config from the dropdown first.", Time = 4})
-                                                                return
-                                                        end
-                                                        Library:AutoLoadConfig(selectedConfig)
+
+                                ElementFunction:AddButton({
+                                        Name = "Auto-Load Selected",
+                                        Callback = function()
+                                                if selectedConfig == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Pick a config from the dropdown first.", Time = 4})
+                                                        return
                                                 end
-                                        })
-                                        ElementFunction:AddButton({
-                                                Name = "Disable Auto-Load",
-                                                Callback = function()
-                                                        Library:UnAutoLoadConfig()
-                                                end
-                                        })
-                                end
+                                                Library:AutoLoadConfig(selectedConfig)
+                                        end
+                                })
+
+                                ElementFunction:AddButton({
+                                        Name = "Disable Auto-Load",
+                                        Callback = function()
+                                                Library:UnAutoLoadConfig()
+                                        end
+                                })
+
                                 ElementFunction:AddButton({
                                         Name = "Share Selected (copy ID)",
                                         Callback = function()
@@ -2732,12 +2963,14 @@ function Library:MakeWindow(WindowConfig)
                                                 Library:ShareConfigId(selectedConfig)
                                         end
                                 })
+
                                 ElementFunction:AddTextbox({
                                         Name = "Config ID",
                                         Default = "",
                                         TextDisappear = false,
                                         Callback = function(text) currentId = text end
                                 })
+
                                 ElementFunction:AddButton({
                                         Name = "Use Config ID",
                                         Callback = function()
@@ -2748,12 +2981,14 @@ function Library:MakeWindow(WindowConfig)
                                                 Library:UseConfigId(currentId)
                                         end
                                 })
+
                                 ElementFunction:AddTextbox({
                                         Name = "Save ID As",
                                         Default = "",
                                         TextDisappear = false,
                                         Callback = function(text) saveAsName = text end
                                 })
+
                                 ElementFunction:AddButton({
                                         Name = "Save Config from ID",
                                         Callback = function()
@@ -2765,6 +3000,7 @@ function Library:MakeWindow(WindowConfig)
                                                 configDropdown:Refresh(getList(), true)
                                         end
                                 })
+
                                 return {
                                         SetName    = function(_, n) currentName = n end,
                                         SetId      = function(_, i) currentId = i end,
@@ -2772,11 +3008,15 @@ function Library:MakeWindow(WindowConfig)
                                         Dropdown   = configDropdown
                                 }
                         end
+
                         return ElementFunction  
                 end     
+
                 local ElementFunction = {}
+
                 function ElementFunction:AddSection(SectionConfig)
                         SectionConfig.Name = SectionConfig.Name or "Section"
+
                         local StrichFrame = Instance.new("Frame")
                         StrichFrame.Size = UDim2.new(0, 3, 0, 14)
                         StrichFrame.Position = UDim2.new(0, 0, 0.5, 0)
@@ -2794,9 +3034,10 @@ function Library:MakeWindow(WindowConfig)
                         local StrichCorner = Instance.new("UICorner")
                         StrichCorner.CornerRadius = UDim.new(0, 100)
                         StrichCorner.Parent = StrichFrame
+
                         local SectionFrame = SetChildren(SetProps(MakeElement("TFrame"), {
                                 Size = UDim2.new(1, 0, 0, 26),
-                                Parent = ItemParent
+                                Parent = Container
                         }), {
                                 SetChildren(SetProps(MakeElement("TFrame"), {
                                         Size = UDim2.new(1, 0, 0, 16),
@@ -2818,19 +3059,23 @@ function Library:MakeWindow(WindowConfig)
                                         MakeElement("List", 0, 6)
                                 }),
                         })
+
                         AddConnection(SectionFrame.Holder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
                                 SectionFrame.Size = UDim2.new(1, 0, 0, SectionFrame.Holder.UIListLayout.AbsoluteContentSize.Y + 31)
                                 SectionFrame.Holder.Size = UDim2.new(1, 0, 0, SectionFrame.Holder.UIListLayout.AbsoluteContentSize.Y)
                         end)
+
                         local SectionFunction = {}
                         for i, v in next, GetElements(SectionFrame.Holder) do
                                 SectionFunction[i] = v 
                         end
                         return SectionFunction
                 end
+
                 for i, v in next, GetElements(Container) do
                         ElementFunction[i] = v 
                 end
+
                 if TabConfig.PremiumOnly then
                         for i, v in next, ElementFunction do
                                 ElementFunction[i] = function() end
@@ -2870,8 +3115,10 @@ function Library:MakeWindow(WindowConfig)
                 end
                 return ElementFunction  
         end  
+
         return TabFunction
 end
+
 local Configs_HUB = {
         Cor_Hub = Color3.fromRGB(10, 10, 10),
         Cor_Options = Color3.fromRGB(10, 10, 10),
@@ -2881,7 +3128,9 @@ local Configs_HUB = {
         Corner_Radius = UDim.new(0, 4),
         Text_Font = Library.Font
 }
+
 local TweenService2 = game:GetService("TweenService")
+
 local function Create2(instance, parent, props)
         local new = Instance.new(instance, parent)
         if props then
@@ -2891,6 +3140,7 @@ local function Create2(instance, parent, props)
         end
         return new
 end
+
 local function SetProps2(instance, props)
         if instance and props then
                 table.foreach(props, function(prop, value)
@@ -2899,6 +3149,7 @@ local function SetProps2(instance, props)
         end
         return instance
 end
+
 local function Corner2(parent, props)
         local new = Create2("UICorner", parent)
         new.CornerRadius = Configs_HUB.Corner_Radius
@@ -2907,6 +3158,7 @@ local function Corner2(parent, props)
         end
         return new
 end
+
 local function Stroke2(parent, props)
         local new = Create2("UIStroke", parent)
         new.Color = Configs_HUB.Cor_Stroke
@@ -2917,6 +3169,7 @@ local function Stroke2(parent, props)
         end
         return new
 end
+
 local function CreateTween(instance, prop, value, time, tweenWait)
         local tween = TweenService2:Create(instance,
                 TweenInfo.new(time, Enum.EasingStyle.Linear),
@@ -2926,32 +3179,39 @@ local function CreateTween(instance, prop, value, time, tweenWait)
                 tween.Completed:Wait()
         end
 end
+
 local ScreenGui = Create2("ScreenGui", Container)
+
 local Menu_Notifi = Create2("Frame", ScreenGui, {
         Size = UDim2.new(0, 300, 1, 0),
         Position = UDim2.new(1, 0, 0, 0),
         AnchorPoint = Vector2.new(1, 0),
         BackgroundTransparency = 1
 })
+
 local Padding2 = Create2("UIPadding", Menu_Notifi, {
         PaddingLeft = UDim.new(0, 25),
         PaddingTop = UDim.new(0, 25),
         PaddingBottom = UDim.new(0, 50)
 })
+
 local ListLayout2 = Create2("UIListLayout", Menu_Notifi, {
         Padding = UDim.new(0, 15),
         VerticalAlignment = "Bottom"
 })
+
 function Library:MakeNotifi(Configs)
         local Title = Configs.Title or "Title!"
         local text = Configs.Text or "Notification content... what will it say??"
         local timewait = Configs.Time or 5
+
         local Frame1 = Create2("Frame", Menu_Notifi, {
                 Size = UDim2.new(2, 0, 0, 0),
                 BackgroundTransparency = 1,
                 AutomaticSize = "Y",
                 Name = "Title"
         })
+
         local Frame2 = Create2("Frame", Frame1, {
                 Size = UDim2.new(0, Menu_Notifi.Size.X.Offset - 50, 0, 0),
                 BackgroundColor3 = Configs_HUB.Cor_Hub,
@@ -2960,6 +3220,7 @@ function Library:MakeNotifi(Configs)
                 BackgroundTransparency = 0.1
         })
         Corner2(Frame2)
+
         local notifGrad = Create2("UIGradient", Frame2, {
                 Color = ColorSequence.new({
                         ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 20)),
@@ -2967,6 +3228,7 @@ function Library:MakeNotifi(Configs)
                 }),
                 Rotation = 90
         })
+
         local TextLabel1 = AddFontObject(Create2("TextLabel", Frame2, {
                 Size = UDim2.new(1, 0, 0, 25),
                 Font = Library.Fonts[Library.SelectedFont] or Library.Font,
@@ -2977,6 +3239,7 @@ function Library:MakeNotifi(Configs)
                 TextXAlignment = "Left",
                 TextColor3 = Configs_HUB.Cor_Text
         }))
+
         local TextButton = AddFontObject(Create2("TextButton", Frame2, {
                 Text = "X",
                 Font = Library.Fonts[Library.SelectedFont] or Library.Font,
@@ -2988,6 +3251,7 @@ function Library:MakeNotifi(Configs)
                 Size = UDim2.new(0, 25, 0, 25)
         }))
         Corner2(TextButton, {CornerRadius = UDim.new(0, 6)})
+
         AddConnection(TextButton.MouseButton1Down, function()
                 local SoundService = game:GetService("SoundService")
                 local sound = Instance.new("Sound", SoundService)
@@ -2996,6 +3260,7 @@ function Library:MakeNotifi(Configs)
                 sound:Play()
                 game:GetService("Debris"):AddItem(sound, 3)
         end)
+
         local TextLabel2 = AddFontObject(Create2("TextLabel", Frame2, {
                 Size = UDim2.new(1, -30, 0, 0),
                 Position = UDim2.new(0, 20, 0, TextButton.Size.Y.Offset + 10),
@@ -3009,6 +3274,7 @@ function Library:MakeNotifi(Configs)
                 BackgroundTransparency = 1,
                 TextWrapped = true
         }))
+
         local FrameSize = Create2("Frame", Frame2, {
                 Size = UDim2.new(1, 0, 0, 2),
                 BackgroundColor3 = Color3.fromRGB(255, 255, 255),
@@ -3028,9 +3294,11 @@ function Library:MakeNotifi(Configs)
                 Position = UDim2.new(0, 0, 1, 5),
                 BackgroundTransparency = 1
         })
+
         task.spawn(function()
                 CreateTween(FrameSize, "Size", UDim2.new(0, 0, 0, 2), timewait, true)
         end)
+
         TextButton.MouseButton1Click:Connect(function()
                 CreateTween(Frame2, "Position", UDim2.new(0, -20, 0, 0), 0.1, true)
                 CreateTween(Frame2, "Position", UDim2.new(0, Menu_Notifi.Size.X.Offset, 0, 0), 0.5, true)
@@ -3047,9 +3315,11 @@ function Library:MakeNotifi(Configs)
                 end
         end)
 end
+
 function Library:Destroy()
         Container:Destroy()
 end
+
 local function _b64_encode(data)
         local b = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
         return ((data:gsub('.', function(x)
@@ -3063,6 +3333,7 @@ local function _b64_encode(data)
                 return b:sub(c + 1, c + 1)
         end) .. ({ '', '==', '=' })[#data % 3 + 1])
 end
+
 local function _b64_decode(data)
         local b = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
         data = string.gsub(data, '[^' .. b .. '=]', '')
@@ -3078,6 +3349,7 @@ local function _b64_decode(data)
                 return string.char(c)
         end))
 end
+
 local function _checkExecutor()
         if not writefile or not readfile or not isfile or not isfolder or not makefolder then
                 warn("Xeioa Config: executor file functions are not available")
@@ -3089,13 +3361,16 @@ local function _checkExecutor()
         end
         return true
 end
+
 local function _ensureFolders()
         if not isfolder(Library.Folder) then makefolder(Library.Folder) end
         if not isfolder(Library.Folder .. "/configs") then makefolder(Library.Folder .. "/configs") end
 end
+
 local function _configPath(name)
         return Library.Folder .. "/configs/" .. tostring(name) .. ".txt"
 end
+
 local function _serializeFlags()
         local Data = {}
         for i, v in pairs(Library.Flags) do
@@ -3107,6 +3382,7 @@ local function _serializeFlags()
         end
         return HttpService:JSONEncode(Data)
 end
+
 function Library:CreateConfig(name)
         if not name or name == "" then
                 warn("Xeioa CreateConfig: name is required")
@@ -3128,6 +3404,7 @@ function Library:CreateConfig(name)
         })
         return true
 end
+
 function Library:UseConfig(name)
         if not name or name == "" then
                 warn("Xeioa UseConfig: name is required")
@@ -3158,6 +3435,7 @@ function Library:UseConfig(name)
         })
         return true
 end
+
 function Library:DeleteConfig(name)
         if not name or name == "" then
                 warn("Xeioa DeleteConfig: name is required")
@@ -3191,6 +3469,7 @@ function Library:DeleteConfig(name)
         })
         return true
 end
+
 function Library:AutoLoadConfig(name)
         if not name or name == "" then
                 warn("Xeioa AutoLoadConfig: name is required")
@@ -3216,6 +3495,7 @@ function Library:AutoLoadConfig(name)
         })
         return true
 end
+
 function Library:UnAutoLoadConfig()
         if not _checkExecutor() then return false end
         local autoPath = Library.Folder .. "/autoload.txt"
@@ -3240,6 +3520,7 @@ function Library:UnAutoLoadConfig()
         })
         return true
 end
+
 function Library:ShareConfigId(name)
         if not name or name == "" then
                 warn("Xeioa ShareConfigId: name is required")
@@ -3268,6 +3549,7 @@ function Library:ShareConfigId(name)
         })
         return id
 end
+
 function Library:UseConfigId(id)
         if not id or id == "" then
                 warn("Xeioa UseConfigId: id is required")
@@ -3293,6 +3575,7 @@ function Library:UseConfigId(id)
         })
         return true
 end
+
 function Library:SaveConfigId(name, id)
         if not name or name == "" then
                 warn("Xeioa SaveConfigId: name is required")
@@ -3325,6 +3608,7 @@ function Library:SaveConfigId(name, id)
         })
         return true
 end
+
 function Library:ListConfigs()
         if not _checkExecutor() then return {} end
         local list = {}
@@ -3337,4 +3621,5 @@ function Library:ListConfigs()
         end
         return list
 end
+
 return Library
