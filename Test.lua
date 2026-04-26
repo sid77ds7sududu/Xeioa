@@ -3015,6 +3015,10 @@ function Library:MakeWindow(WindowConfig)
                 local ElementFunction = {}
 
                 function ElementFunction:AddSection(SectionConfig)
+                        if type(SectionConfig) == "string" then
+                                SectionConfig = {Name = SectionConfig}
+                        end
+                        SectionConfig = SectionConfig or {}
                         SectionConfig.Name = SectionConfig.Name or "Section"
 
                         local StrichFrame = Instance.new("Frame")
