@@ -68,6 +68,110 @@ local Library = {
                         Divider = Color3.fromRGB(60, 45, 10),
                         Text = Color3.fromRGB(255, 245, 200),
                         TextDark = Color3.fromRGB(210, 175, 90)
+                },
+                Purple = {
+                        Main = Color3.fromRGB(14, 8, 20),
+                        Second = Color3.fromRGB(28, 16, 40),
+                        Stroke = Color3.fromRGB(120, 60, 200),
+                        Divider = Color3.fromRGB(50, 25, 80),
+                        Text = Color3.fromRGB(245, 230, 255),
+                        TextDark = Color3.fromRGB(180, 140, 220)
+                },
+                Cyan = {
+                        Main = Color3.fromRGB(5, 16, 20),
+                        Second = Color3.fromRGB(10, 30, 38),
+                        Stroke = Color3.fromRGB(40, 170, 200),
+                        Divider = Color3.fromRGB(20, 60, 75),
+                        Text = Color3.fromRGB(220, 250, 255),
+                        TextDark = Color3.fromRGB(120, 200, 220)
+                },
+                Pink = {
+                        Main = Color3.fromRGB(20, 10, 18),
+                        Second = Color3.fromRGB(38, 18, 32),
+                        Stroke = Color3.fromRGB(220, 80, 160),
+                        Divider = Color3.fromRGB(75, 25, 60),
+                        Text = Color3.fromRGB(255, 230, 245),
+                        TextDark = Color3.fromRGB(220, 140, 190)
+                },
+                Mint = {
+                        Main = Color3.fromRGB(8, 20, 16),
+                        Second = Color3.fromRGB(14, 36, 28),
+                        Stroke = Color3.fromRGB(60, 200, 150),
+                        Divider = Color3.fromRGB(20, 65, 50),
+                        Text = Color3.fromRGB(225, 255, 245),
+                        TextDark = Color3.fromRGB(130, 220, 185)
+                },
+                Sunset = {
+                        Main = Color3.fromRGB(22, 12, 8),
+                        Second = Color3.fromRGB(40, 22, 14),
+                        Stroke = Color3.fromRGB(230, 120, 50),
+                        Divider = Color3.fromRGB(80, 40, 20),
+                        Text = Color3.fromRGB(255, 235, 215),
+                        TextDark = Color3.fromRGB(230, 170, 110)
+                },
+                Midnight = {
+                        Main = Color3.fromRGB(4, 6, 14),
+                        Second = Color3.fromRGB(10, 14, 28),
+                        Stroke = Color3.fromRGB(60, 80, 160),
+                        Divider = Color3.fromRGB(18, 24, 50),
+                        Text = Color3.fromRGB(220, 230, 255),
+                        TextDark = Color3.fromRGB(130, 150, 210)
+                },
+                Crimson = {
+                        Main = Color3.fromRGB(18, 4, 8),
+                        Second = Color3.fromRGB(36, 8, 14),
+                        Stroke = Color3.fromRGB(200, 30, 60),
+                        Divider = Color3.fromRGB(70, 14, 24),
+                        Text = Color3.fromRGB(255, 220, 225),
+                        TextDark = Color3.fromRGB(220, 130, 140)
+                },
+                Lavender = {
+                        Main = Color3.fromRGB(220, 215, 235),
+                        Second = Color3.fromRGB(205, 198, 225),
+                        Stroke = Color3.fromRGB(140, 120, 190),
+                        Divider = Color3.fromRGB(190, 182, 215),
+                        Text = Color3.fromRGB(40, 25, 70),
+                        TextDark = Color3.fromRGB(100, 80, 140)
+                },
+                Slate = {
+                        Main = Color3.fromRGB(20, 22, 26),
+                        Second = Color3.fromRGB(32, 36, 42),
+                        Stroke = Color3.fromRGB(110, 120, 140),
+                        Divider = Color3.fromRGB(50, 56, 64),
+                        Text = Color3.fromRGB(230, 235, 245),
+                        TextDark = Color3.fromRGB(160, 170, 185)
+                },
+                Aqua = {
+                        Main = Color3.fromRGB(6, 18, 22),
+                        Second = Color3.fromRGB(10, 32, 38),
+                        Stroke = Color3.fromRGB(20, 200, 180),
+                        Divider = Color3.fromRGB(18, 60, 60),
+                        Text = Color3.fromRGB(220, 255, 250),
+                        TextDark = Color3.fromRGB(110, 210, 200)
+                },
+                Rose = {
+                        Main = Color3.fromRGB(22, 10, 14),
+                        Second = Color3.fromRGB(40, 18, 26),
+                        Stroke = Color3.fromRGB(230, 100, 130),
+                        Divider = Color3.fromRGB(80, 30, 45),
+                        Text = Color3.fromRGB(255, 230, 235),
+                        TextDark = Color3.fromRGB(220, 150, 170)
+                },
+                Mono = {
+                        Main = Color3.fromRGB(0, 0, 0),
+                        Second = Color3.fromRGB(15, 15, 15),
+                        Stroke = Color3.fromRGB(255, 255, 255),
+                        Divider = Color3.fromRGB(40, 40, 40),
+                        Text = Color3.fromRGB(255, 255, 255),
+                        TextDark = Color3.fromRGB(180, 180, 180)
+                },
+                Matrix = {
+                        Main = Color3.fromRGB(0, 8, 0),
+                        Second = Color3.fromRGB(0, 18, 0),
+                        Stroke = Color3.fromRGB(0, 220, 50),
+                        Divider = Color3.fromRGB(0, 45, 0),
+                        Text = Color3.fromRGB(180, 255, 180),
+                        TextDark = Color3.fromRGB(60, 180, 60)
                 }
         },
         Fonts = {
@@ -2783,12 +2887,19 @@ function Library:MakeWindow(WindowConfig)
                         function ElementFunction:AddConfigSection(ConfigSectionConfig)
                                 ConfigSectionConfig = ConfigSectionConfig or {}
 
-                                local currentName = ""
-                                local currentId   = ""
-                                local saveAsName  = ""
+                                local currentName    = ""
+                                local selectedConfig = ""
+                                local currentId      = ""
+                                local saveAsName     = ""
 
-                                local nameBox = ElementFunction:AddTextbox({
-                                        Name = "Config Name",
+                                local function getList()
+                                        local list = Library:ListConfigs() or {}
+                                        if #list == 0 then list = {"(no configs)"} end
+                                        return list
+                                end
+
+                                ElementFunction:AddTextbox({
+                                        Name = "New Config Name",
                                         Default = "",
                                         TextDisappear = false,
                                         Callback = function(text) currentName = text end
@@ -2802,39 +2913,66 @@ function Library:MakeWindow(WindowConfig)
                                                         return
                                                 end
                                                 Library:CreateConfig(currentName)
+                                                if _G.__XeioaConfigDropdown then
+                                                        _G.__XeioaConfigDropdown:Refresh(getList(), true)
+                                                end
+                                        end
+                                })
+
+                                local configDropdown = ElementFunction:AddDropdown({
+                                        Name = "Saved Configs",
+                                        Default = "",
+                                        Options = getList(),
+                                        Callback = function(value)
+                                                if value == "(no configs)" then
+                                                        selectedConfig = ""
+                                                else
+                                                        selectedConfig = value or ""
+                                                end
+                                        end
+                                })
+                                _G.__XeioaConfigDropdown = configDropdown
+
+                                ElementFunction:AddButton({
+                                        Name = "Refresh List",
+                                        Callback = function()
+                                                configDropdown:Refresh(getList(), true)
+                                                Library:MakeNotification({Name = "Config", Content = "Config list refreshed.", Time = 3})
                                         end
                                 })
 
                                 ElementFunction:AddButton({
-                                        Name = "Load Config",
+                                        Name = "Load Selected",
                                         Callback = function()
-                                                if currentName == "" then
-                                                        Library:MakeNotification({Name = "Config", Content = "Enter a config name first.", Time = 4})
+                                                if selectedConfig == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Pick a config from the dropdown first.", Time = 4})
                                                         return
                                                 end
-                                                Library:UseConfig(currentName)
+                                                Library:UseConfig(selectedConfig)
                                         end
                                 })
 
                                 ElementFunction:AddButton({
-                                        Name = "Delete Config",
+                                        Name = "Delete Selected",
                                         Callback = function()
-                                                if currentName == "" then
-                                                        Library:MakeNotification({Name = "Config", Content = "Enter a config name first.", Time = 4})
+                                                if selectedConfig == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Pick a config from the dropdown first.", Time = 4})
                                                         return
                                                 end
-                                                Library:DeleteConfig(currentName)
+                                                Library:DeleteConfig(selectedConfig)
+                                                selectedConfig = ""
+                                                configDropdown:Refresh(getList(), true)
                                         end
                                 })
 
                                 ElementFunction:AddButton({
-                                        Name = "Auto-Load This Config",
+                                        Name = "Auto-Load Selected",
                                         Callback = function()
-                                                if currentName == "" then
-                                                        Library:MakeNotification({Name = "Config", Content = "Enter a config name first.", Time = 4})
+                                                if selectedConfig == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Pick a config from the dropdown first.", Time = 4})
                                                         return
                                                 end
-                                                Library:AutoLoadConfig(currentName)
+                                                Library:AutoLoadConfig(selectedConfig)
                                         end
                                 })
 
@@ -2846,13 +2984,13 @@ function Library:MakeWindow(WindowConfig)
                                 })
 
                                 ElementFunction:AddButton({
-                                        Name = "Share Config (copy ID)",
+                                        Name = "Share Selected (copy ID)",
                                         Callback = function()
-                                                if currentName == "" then
-                                                        Library:MakeNotification({Name = "Config", Content = "Enter a config name first.", Time = 4})
+                                                if selectedConfig == "" then
+                                                        Library:MakeNotification({Name = "Config", Content = "Pick a config from the dropdown first.", Time = 4})
                                                         return
                                                 end
-                                                Library:ShareConfigId(currentName)
+                                                Library:ShareConfigId(selectedConfig)
                                         end
                                 })
 
@@ -2889,12 +3027,15 @@ function Library:MakeWindow(WindowConfig)
                                                         return
                                                 end
                                                 Library:SaveConfigId(saveAsName, currentId)
+                                                configDropdown:Refresh(getList(), true)
                                         end
                                 })
 
                                 return {
-                                        SetName = function(_, n) currentName = n end,
-                                        SetId   = function(_, i) currentId = i end
+                                        SetName    = function(_, n) currentName = n end,
+                                        SetId      = function(_, i) currentId = i end,
+                                        Refresh    = function() configDropdown:Refresh(getList(), true) end,
+                                        Dropdown   = configDropdown
                                 }
                         end
 
