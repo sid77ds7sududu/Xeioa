@@ -3148,6 +3148,176 @@ function Library:MakeWindow(WindowConfig)
                         return SectionFunction
                 end
 
+                function ElementFunction:AddTabSection(SectionConfig)
+                        if type(SectionConfig) == "string" then
+                                SectionConfig = {Name = SectionConfig}
+                        end
+                        SectionConfig = SectionConfig or {}
+                        SectionConfig.Name = SectionConfig.Name or "Section"
+
+                        -- Accent line left of header
+                        local StrichFrame = Instance.new("Frame")
+                        StrichFrame.Size = UDim2.new(0, 3, 0, 14)
+                        StrichFrame.Position = UDim2.new(0, 0, 0.5, 0)
+                        StrichFrame.AnchorPoint = Vector2.new(0, 0.5)
+                        StrichFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                        StrichFrame.BorderSizePixel = 0
+                        Create("UIGradient", {
+                                Color = ColorSequence.new({
+                                        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+                                        ColorSequenceKeypoint.new(1, Color3.fromRGB(160, 160, 160))
+                                }),
+                                Rotation = 90
+                        }).Parent = StrichFrame
+                        local StrichCorner = Instance.new("UICorner")
+                        StrichCorner.CornerRadius = UDim.new(0, 100)
+                        StrichCorner.Parent = StrichFrame
+
+                        -- Outer wrapper (auto-resizes)
+                        local TabSectionFrame = SetProps(MakeElement("TFrame"), {
+                                Size = UDim2.new(1, 0, 0, 100),
+                                Parent = Container,
+                                ClipsDescendants = false,
+                        })
+
+                        -- Section header
+                        SetChildren(SetProps(MakeElement("TFrame"), {
+                                Size = UDim2.new(1, 0, 0, 22),
+                                Position = UDim2.new(0, 0, 0, 3),
+                                Parent = TabSectionFrame,
+                        }), {
+                                StrichFrame,
+                                AddThemeObject(SetProps(MakeElement("Label", SectionConfig.Name, 14), {
+                                        Size = UDim2.new(1, -12, 1, 0),
+                                        Position = UDim2.new(0, 10, 0, 0),
+                                        Font = Enum.Font.FredokaOne,
+                                }), "TextDark"),
+                        })
+
+                        -- Inner frame: left tab sidebar + right content
+                        local InnerFrame = SetProps(MakeElement("TFrame"), {
+                                Size = UDim2.new(1, 0, 0, 60),
+                                Position = UDim2.new(0, 0, 0, 28),
+                                Parent = TabSectionFrame,
+                                Name = "TSInner",
+                                ClipsDescendants = false,
+                        })
+
+                        -- Left tab sidebar background
+                        local TabBar = AddThemeObject(SetChildren(SetProps(MakeElement("Frame"), {
+                                Size = UDim2.new(0, 82, 1, 0),
+                                Position = UDim2.new(0, 0, 0, 0),
+                                Parent = InnerFrame,
+                                BackgroundTransparency = 0.55,
+                        }), {
+                                MakeElement("List", 0, 0),
+                                AddThemeObject(MakeElement("Stroke"), "Stroke"),
+                        }), "Second")
+                        local TabBarCorner = Instance.new("UICorner")
+                        TabBarCorner.CornerRadius = UDim.new(0, 6)
+                        TabBarCorner.Parent = TabBar
+
+                        -- Separator line
+                        AddThemeObject(SetProps(MakeElement("Frame"), {
+                                Size = UDim2.new(0, 1, 1, 0),
+                                Position = UDim2.new(0, 83, 0, 0),
+                                Parent = InnerFrame,
+                                BackgroundTransparency = 0.5,
+                        }), "Stroke")
+
+                        local AllTabs = {}
+                        local FirstInnerTab = true
+
+                        local TabSectionFunction = {}
+
+                        local function resizeInner()
+                                local maxH = 60
+                                for _, entry in ipairs(AllTabs) do
+                                        if entry.content.Visible then
+                                                local h = entry.content.UIListLayout.AbsoluteContentSize.Y + 16
+                                                if h > maxH then maxH = h end
+                                        end
+                                end
+                                InnerFrame.Size = UDim2.new(1, 0, 0, maxH)
+                                TabSectionFrame.Size = UDim2.new(1, 0, 0, maxH + 31)
+                        end
+
+                        function TabSectionFunction:AddTab(TabName)
+                                local IsFirst = FirstInnerTab
+                                if IsFirst then FirstInnerTab = false end
+
+                                -- Tab button
+                                local TabBtn = AddThemeObject(SetChildren(SetProps(MakeElement("Button"), {
+                                        Size = UDim2.new(1, 0, 0, 28),
+                                        Parent = TabBar,
+                                        BackgroundTransparency = IsFirst and 0.45 or 0.9,
+                                }), {
+                                        AddThemeObject(SetProps(MakeElement("Label", TabName, 12), {
+                                                Size = UDim2.new(1, -10, 1, 0),
+                                                Position = UDim2.new(0, 8, 0, 0),
+                                                TextTransparency = IsFirst and 0 or 0.45,
+                                                Font = Enum.Font.FredokaOne,
+                                                TextXAlignment = Enum.TextXAlignment.Left,
+                                                Name = "Title",
+                                        }), "Text"),
+                                }), "Second")
+                                local BtnCorner = Instance.new("UICorner")
+                                BtnCorner.CornerRadius = UDim.new(0, 5)
+                                BtnCorner.Parent = TabBtn
+
+                                -- Content area for this tab
+                                local ContentFrame = SetChildren(SetProps(MakeElement("TFrame"), {
+                                        Size = UDim2.new(1, -90, 1, 0),
+                                        Position = UDim2.new(0, 90, 0, 0),
+                                        Parent = InnerFrame,
+                                        Visible = IsFirst,
+                                        Name = "TSContent",
+                                }), {
+                                        MakeElement("List", 0, 6),
+                                        MakeElement("Padding", 6, 0, 0, 6),
+                                })
+
+                                local entry = {btn = TabBtn, content = ContentFrame}
+                                table.insert(AllTabs, entry)
+
+                                AddConnection(ContentFrame.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
+                                        if ContentFrame.Visible then
+                                                resizeInner()
+                                        end
+                                end)
+
+                                AddConnection(TabBtn.MouseButton1Click, function()
+                                        for _, e in ipairs(AllTabs) do
+                                                e.content.Visible = false
+                                                TweenService:Create(e.btn, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.9}):Play()
+                                                TweenService:Create(e.btn.Title, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {TextTransparency = 0.45}):Play()
+                                        end
+                                        ContentFrame.Visible = true
+                                        TweenService:Create(TabBtn, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.45}):Play()
+                                        TweenService:Create(TabBtn.Title, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
+                                        resizeInner()
+                                end)
+
+                                AddConnection(TabBtn.MouseButton1Down, function()
+                                        local SoundService = game:GetService("SoundService")
+                                        local sound = Instance.new("Sound", SoundService)
+                                        sound.SoundId = "rbxassetid://6895079853"
+                                        sound.Volume = 1
+                                        sound:Play()
+                                        game:GetService("Debris"):AddItem(sound, 3)
+                                end)
+
+                                local TabElems = {}
+                                for i, v in next, GetElements(ContentFrame) do
+                                        TabElems[i] = v
+                                end
+                                return TabElems
+                        end
+
+                        return TabSectionFunction
+                end
+
+
                 for i, v in next, GetElements(Container) do
                         ElementFunction[i] = v 
                 end
