@@ -780,7 +780,7 @@ function Library:MakeWindow(WindowConfig)
         }), "Stroke").Parent = TabSidePanel
 
         local TabHolder = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 4), {
-                Size = UDim2.new(1, 0, 1, 0),
+                Size = UDim2.new(1, 0, 1, -62),
                 BackgroundTransparency = 1
         }), {
                 MakeElement("List", 0, 0),
@@ -791,6 +791,67 @@ function Library:MakeWindow(WindowConfig)
         AddConnection(TabHolder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
                 TabHolder.CanvasSize = UDim2.new(0, 0, 0, TabHolder.UIListLayout.AbsoluteContentSize.Y + 16)
         end)
+
+        local SideFooter = AddThemeObject(SetProps(MakeElement("Frame"), {
+                Size = UDim2.new(1, 0, 0, 62),
+                Position = UDim2.new(0, 0, 1, -62),
+                BackgroundTransparency = 0.6
+        }), "Main")
+        SideFooter.Parent = TabSidePanel
+
+        AddThemeObject(SetProps(MakeElement("Frame"), {
+                Size = UDim2.new(1, 0, 0, 1),
+                BackgroundTransparency = 0.4
+        }), "Stroke").Parent = SideFooter
+
+        local PlayerAvatar = Create("ImageLabel", {
+                Size = UDim2.new(0, 36, 0, 36),
+                Position = UDim2.new(0, 10, 0.5, 0),
+                AnchorPoint = Vector2.new(0, 0.5),
+                BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+                BackgroundTransparency = 0.5,
+                Image = "",
+                ScaleType = Enum.ScaleType.Crop,
+                Parent = SideFooter
+        })
+        Create("UICorner", {CornerRadius = UDim.new(0, 8)}).Parent = PlayerAvatar
+        Create("UIStroke", {Color = Color3.fromRGB(255,255,255), Transparency = 0.8, Thickness = 1}).Parent = PlayerAvatar
+
+        local FooterName = AddThemeObject(Create("TextLabel", {
+                Size = UDim2.new(1, -56, 0, 16),
+                Position = UDim2.new(0, 52, 0.5, -10),
+                BackgroundTransparency = 1,
+                Text = "...",
+                TextSize = 13,
+                Font = Enum.Font.GothamBold,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextTruncate = Enum.TextTruncate.AtEnd
+        }), "Text")
+        FooterName.Parent = SideFooter
+
+        local FooterSub = AddThemeObject(Create("TextLabel", {
+                Size = UDim2.new(1, -56, 0, 13),
+                Position = UDim2.new(0, 52, 0.5, 8),
+                BackgroundTransparency = 1,
+                Text = "Join Xeioa",
+                TextSize = 11,
+                Font = Enum.Font.Gotham,
+                TextXAlignment = Enum.TextXAlignment.Left
+        }), "TextDark")
+        FooterSub.Parent = SideFooter
+
+        local LocalPlayer = Players.LocalPlayer
+        if LocalPlayer then
+                FooterName.Text = LocalPlayer.DisplayName or LocalPlayer.Name
+                task.spawn(function()
+                        local ok, img = pcall(function()
+                                return Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
+                        end)
+                        if ok and img then
+                                PlayerAvatar.Image = img
+                        end
+                end)
+        end
 
         local CloseBtn = SetChildren(SetProps(MakeElement("Button"), {
                 Size = UDim2.new(0.5, 0, 1, 0),
