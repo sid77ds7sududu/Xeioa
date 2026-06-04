@@ -12,6 +12,8 @@ local Library = {
         FontObjects = {},
         Connections = {},
         Flags = {},
+        _activeTabIco = nil,
+        _activeTabTitle = nil,
         Themes = {
                 Default = {
                         Main = Color3.fromRGB(10, 10, 10),
@@ -19,7 +21,8 @@ local Library = {
                         Stroke = Color3.fromRGB(60, 60, 60),
                         Divider = Color3.fromRGB(30, 30, 30),
                         Text = Color3.fromRGB(240, 240, 240),
-                        TextDark = Color3.fromRGB(160, 160, 160)
+                        TextDark = Color3.fromRGB(160, 160, 160),
+                        Accent = Color3.fromRGB(230, 180, 60)
                 },
                 Light = {
                         Main = Color3.fromRGB(230, 230, 230),
@@ -27,7 +30,8 @@ local Library = {
                         Stroke = Color3.fromRGB(180, 180, 180),
                         Divider = Color3.fromRGB(200, 200, 200),
                         Text = Color3.fromRGB(20, 20, 20),
-                        TextDark = Color3.fromRGB(80, 80, 80)
+                        TextDark = Color3.fromRGB(80, 80, 80),
+                        Accent = Color3.fromRGB(70, 110, 220)
                 },
                 Blurple = {
                         Main = Color3.fromRGB(10, 10, 20),
@@ -35,7 +39,8 @@ local Library = {
                         Stroke = Color3.fromRGB(80, 80, 160),
                         Divider = Color3.fromRGB(40, 40, 80),
                         Text = Color3.fromRGB(240, 240, 255),
-                        TextDark = Color3.fromRGB(150, 150, 220)
+                        TextDark = Color3.fromRGB(150, 150, 220),
+                        Accent = Color3.fromRGB(130, 110, 255)
                 },
                 Red = {
                         Main = Color3.fromRGB(15, 8, 8),
@@ -43,7 +48,8 @@ local Library = {
                         Stroke = Color3.fromRGB(140, 40, 40),
                         Divider = Color3.fromRGB(60, 20, 20),
                         Text = Color3.fromRGB(255, 230, 230),
-                        TextDark = Color3.fromRGB(200, 130, 130)
+                        TextDark = Color3.fromRGB(200, 130, 130),
+                        Accent = Color3.fromRGB(240, 60, 60)
                 },
                 Ocean = {
                         Main = Color3.fromRGB(8, 14, 20),
@@ -51,7 +57,8 @@ local Library = {
                         Stroke = Color3.fromRGB(30, 90, 140),
                         Divider = Color3.fromRGB(15, 45, 70),
                         Text = Color3.fromRGB(210, 235, 255),
-                        TextDark = Color3.fromRGB(100, 170, 220)
+                        TextDark = Color3.fromRGB(100, 170, 220),
+                        Accent = Color3.fromRGB(50, 170, 240)
                 },
                 Forest = {
                         Main = Color3.fromRGB(8, 15, 8),
@@ -59,7 +66,8 @@ local Library = {
                         Stroke = Color3.fromRGB(40, 110, 40),
                         Divider = Color3.fromRGB(20, 50, 20),
                         Text = Color3.fromRGB(220, 255, 220),
-                        TextDark = Color3.fromRGB(120, 200, 120)
+                        TextDark = Color3.fromRGB(120, 200, 120),
+                        Accent = Color3.fromRGB(60, 200, 80)
                 },
                 Gold = {
                         Main = Color3.fromRGB(15, 12, 5),
@@ -67,7 +75,8 @@ local Library = {
                         Stroke = Color3.fromRGB(160, 120, 30),
                         Divider = Color3.fromRGB(60, 45, 10),
                         Text = Color3.fromRGB(255, 245, 200),
-                        TextDark = Color3.fromRGB(210, 175, 90)
+                        TextDark = Color3.fromRGB(210, 175, 90),
+                        Accent = Color3.fromRGB(240, 185, 40)
                 },
                 Purple = {
                         Main = Color3.fromRGB(14, 8, 20),
@@ -75,7 +84,8 @@ local Library = {
                         Stroke = Color3.fromRGB(120, 60, 200),
                         Divider = Color3.fromRGB(50, 25, 80),
                         Text = Color3.fromRGB(245, 230, 255),
-                        TextDark = Color3.fromRGB(180, 140, 220)
+                        TextDark = Color3.fromRGB(180, 140, 220),
+                        Accent = Color3.fromRGB(170, 90, 255)
                 },
                 Cyan = {
                         Main = Color3.fromRGB(5, 16, 20),
@@ -83,7 +93,8 @@ local Library = {
                         Stroke = Color3.fromRGB(40, 170, 200),
                         Divider = Color3.fromRGB(20, 60, 75),
                         Text = Color3.fromRGB(220, 250, 255),
-                        TextDark = Color3.fromRGB(120, 200, 220)
+                        TextDark = Color3.fromRGB(120, 200, 220),
+                        Accent = Color3.fromRGB(40, 210, 235)
                 },
                 Pink = {
                         Main = Color3.fromRGB(20, 10, 18),
@@ -91,7 +102,8 @@ local Library = {
                         Stroke = Color3.fromRGB(220, 80, 160),
                         Divider = Color3.fromRGB(75, 25, 60),
                         Text = Color3.fromRGB(255, 230, 245),
-                        TextDark = Color3.fromRGB(220, 140, 190)
+                        TextDark = Color3.fromRGB(220, 140, 190),
+                        Accent = Color3.fromRGB(240, 90, 175)
                 },
                 Mint = {
                         Main = Color3.fromRGB(8, 20, 16),
@@ -99,7 +111,8 @@ local Library = {
                         Stroke = Color3.fromRGB(60, 200, 150),
                         Divider = Color3.fromRGB(20, 65, 50),
                         Text = Color3.fromRGB(225, 255, 245),
-                        TextDark = Color3.fromRGB(130, 220, 185)
+                        TextDark = Color3.fromRGB(130, 220, 185),
+                        Accent = Color3.fromRGB(60, 215, 160)
                 },
                 Sunset = {
                         Main = Color3.fromRGB(22, 12, 8),
@@ -107,7 +120,8 @@ local Library = {
                         Stroke = Color3.fromRGB(230, 120, 50),
                         Divider = Color3.fromRGB(80, 40, 20),
                         Text = Color3.fromRGB(255, 235, 215),
-                        TextDark = Color3.fromRGB(230, 170, 110)
+                        TextDark = Color3.fromRGB(230, 170, 110),
+                        Accent = Color3.fromRGB(240, 130, 50)
                 },
                 Midnight = {
                         Main = Color3.fromRGB(4, 6, 14),
@@ -115,7 +129,8 @@ local Library = {
                         Stroke = Color3.fromRGB(60, 80, 160),
                         Divider = Color3.fromRGB(18, 24, 50),
                         Text = Color3.fromRGB(220, 230, 255),
-                        TextDark = Color3.fromRGB(130, 150, 210)
+                        TextDark = Color3.fromRGB(130, 150, 210),
+                        Accent = Color3.fromRGB(100, 130, 255)
                 },
                 Crimson = {
                         Main = Color3.fromRGB(18, 4, 8),
@@ -123,7 +138,8 @@ local Library = {
                         Stroke = Color3.fromRGB(200, 30, 60),
                         Divider = Color3.fromRGB(70, 14, 24),
                         Text = Color3.fromRGB(255, 220, 225),
-                        TextDark = Color3.fromRGB(220, 130, 140)
+                        TextDark = Color3.fromRGB(220, 130, 140),
+                        Accent = Color3.fromRGB(220, 40, 75)
                 },
                 Lavender = {
                         Main = Color3.fromRGB(220, 215, 235),
@@ -131,7 +147,8 @@ local Library = {
                         Stroke = Color3.fromRGB(140, 120, 190),
                         Divider = Color3.fromRGB(190, 182, 215),
                         Text = Color3.fromRGB(40, 25, 70),
-                        TextDark = Color3.fromRGB(100, 80, 140)
+                        TextDark = Color3.fromRGB(100, 80, 140),
+                        Accent = Color3.fromRGB(120, 90, 200)
                 },
                 Slate = {
                         Main = Color3.fromRGB(20, 22, 26),
@@ -139,7 +156,8 @@ local Library = {
                         Stroke = Color3.fromRGB(110, 120, 140),
                         Divider = Color3.fromRGB(50, 56, 64),
                         Text = Color3.fromRGB(230, 235, 245),
-                        TextDark = Color3.fromRGB(160, 170, 185)
+                        TextDark = Color3.fromRGB(160, 170, 185),
+                        Accent = Color3.fromRGB(130, 160, 220)
                 },
                 Aqua = {
                         Main = Color3.fromRGB(6, 18, 22),
@@ -147,7 +165,8 @@ local Library = {
                         Stroke = Color3.fromRGB(20, 200, 180),
                         Divider = Color3.fromRGB(18, 60, 60),
                         Text = Color3.fromRGB(220, 255, 250),
-                        TextDark = Color3.fromRGB(110, 210, 200)
+                        TextDark = Color3.fromRGB(110, 210, 200),
+                        Accent = Color3.fromRGB(20, 215, 190)
                 },
                 Rose = {
                         Main = Color3.fromRGB(22, 10, 14),
@@ -155,7 +174,8 @@ local Library = {
                         Stroke = Color3.fromRGB(230, 100, 130),
                         Divider = Color3.fromRGB(80, 30, 45),
                         Text = Color3.fromRGB(255, 230, 235),
-                        TextDark = Color3.fromRGB(220, 150, 170)
+                        TextDark = Color3.fromRGB(220, 150, 170),
+                        Accent = Color3.fromRGB(240, 100, 135)
                 },
                 Mono = {
                         Main = Color3.fromRGB(0, 0, 0),
@@ -163,7 +183,8 @@ local Library = {
                         Stroke = Color3.fromRGB(255, 255, 255),
                         Divider = Color3.fromRGB(40, 40, 40),
                         Text = Color3.fromRGB(255, 255, 255),
-                        TextDark = Color3.fromRGB(180, 180, 180)
+                        TextDark = Color3.fromRGB(180, 180, 180),
+                        Accent = Color3.fromRGB(210, 210, 210)
                 },
                 Matrix = {
                         Main = Color3.fromRGB(0, 8, 0),
@@ -171,7 +192,8 @@ local Library = {
                         Stroke = Color3.fromRGB(0, 220, 50),
                         Divider = Color3.fromRGB(0, 45, 0),
                         Text = Color3.fromRGB(180, 255, 180),
-                        TextDark = Color3.fromRGB(60, 180, 60)
+                        TextDark = Color3.fromRGB(60, 180, 60),
+                        Accent = Color3.fromRGB(0, 230, 60)
                 }
         },
         Fonts = {
@@ -345,6 +367,13 @@ local function SetTheme()
                         end)
                 end
         end
+        if Library._activeTabIco then
+                pcall(function()
+                        local _acc = Library.Themes[Library.SelectedTheme].Accent or Color3.fromRGB(230, 180, 60)
+                        Library._activeTabIco.ImageColor3 = _acc
+                        Library._activeTabTitle.TextColor3 = _acc
+                end)
+        end
 end
 
 local function AddFontObject(Object)
@@ -379,6 +408,23 @@ function Library:SetFont(FontName)
         Library.SelectedFont = FontName
         Library.Font = Library.Fonts[FontName]
         SetFont()
+end
+
+function Library:AddTheme(name, colors)
+        if not name or not colors then return end
+        Library.Themes[name] = {
+                Main     = colors.Main     or Color3.fromRGB(10, 10, 10),
+                Second   = colors.Second   or Color3.fromRGB(18, 18, 18),
+                Stroke   = colors.Stroke   or Color3.fromRGB(60, 60, 60),
+                Divider  = colors.Divider  or Color3.fromRGB(30, 30, 30),
+                Text     = colors.Text     or Color3.fromRGB(240, 240, 240),
+                TextDark = colors.TextDark or Color3.fromRGB(160, 160, 160),
+                Accent   = colors.Accent   or Color3.fromRGB(230, 180, 60)
+        }
+end
+
+function Library:GetAccent()
+        return Library.Themes[Library.SelectedTheme].Accent or Color3.fromRGB(230, 180, 60)
 end
 
 local function PackColor(Color)
@@ -1153,42 +1199,42 @@ function Library:MakeWindow(WindowConfig)
                         SectionAccent.Size = UDim2.new(0, 3, 0, 13)
                         SectionAccent.Position = UDim2.new(0, 8, 0.5, 0)
                         SectionAccent.AnchorPoint = Vector2.new(0, 0.5)
-                        SectionAccent.BackgroundColor3 = Color3.fromRGB(230, 180, 60)
                         SectionAccent.BorderSizePixel = 0
                         local SectionAccentCorner = Instance.new("UICorner")
                         SectionAccentCorner.CornerRadius = UDim.new(0, 100)
                         SectionAccentCorner.Parent = SectionAccent
                         SectionAccent.Parent = SectionBarFrame
+                        AddThemeObject(SectionAccent, "Accent")
                         local SectionLabel = Instance.new("TextLabel")
                         SectionLabel.Size = UDim2.new(1, -36, 1, 0)
                         SectionLabel.Position = UDim2.new(0, 18, 0, 0)
                         SectionLabel.BackgroundTransparency = 1
                         SectionLabel.Text = string.upper(_secName)
-                        SectionLabel.TextColor3 = Color3.fromRGB(230, 180, 60)
                         SectionLabel.Font = Enum.Font.GothamBold
                         SectionLabel.TextSize = 11
                         SectionLabel.TextXAlignment = Enum.TextXAlignment.Left
                         SectionLabel.Parent = SectionBarFrame
+                        AddThemeObject(SectionLabel, "Accent")
                         local ArrowFrame = Instance.new("Frame")
                         ArrowFrame.Size = UDim2.new(0, 16, 0, 16)
                         ArrowFrame.Position = UDim2.new(1, -20, 0.5, 0)
                         ArrowFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-                        ArrowFrame.BackgroundColor3 = Color3.fromRGB(230, 180, 60)
                         ArrowFrame.BackgroundTransparency = 0.75
                         ArrowFrame.BorderSizePixel = 0
                         local ArrowFrameCorner = Instance.new("UICorner")
                         ArrowFrameCorner.CornerRadius = UDim.new(0, 4)
                         ArrowFrameCorner.Parent = ArrowFrame
                         ArrowFrame.Parent = SectionBarFrame
+                        AddThemeObject(ArrowFrame, "Accent")
                         local ArrowIco = Instance.new("ImageLabel")
                         ArrowIco.Size = UDim2.new(0, 10, 0, 10)
                         ArrowIco.Position = UDim2.new(0.5, 0, 0.5, 0)
                         ArrowIco.AnchorPoint = Vector2.new(0.5, 0.5)
                         ArrowIco.BackgroundTransparency = 1
                         ArrowIco.Image = "rbxassetid://7072706796"
-                        ArrowIco.ImageColor3 = Color3.fromRGB(230, 180, 60)
                         ArrowIco.Rotation = 0
                         ArrowIco.Parent = ArrowFrame
+                        AddThemeObject(ArrowIco, "Accent")
                         SectionHeaders[_secName].arrowIco = ArrowIco
                         SectionHeaders[_secName].arrowFrame = ArrowFrame
                         AddConnection(SectionBarFrame.MouseButton1Click, function()
@@ -1256,20 +1302,24 @@ function Library:MakeWindow(WindowConfig)
 
                 if FirstTab then
                         FirstTab = false
+                        local _initAcc = Library.Themes[Library.SelectedTheme].Accent or Color3.fromRGB(230, 180, 60)
                         TabFrame.Ico.ImageTransparency = 0
-                        TabFrame.Ico.ImageColor3 = Color3.fromRGB(230, 180, 60)
+                        TabFrame.Ico.ImageColor3 = _initAcc
                         TabFrame.Title.TextTransparency = 0
-                        TabFrame.Title.TextColor3 = Color3.fromRGB(230, 180, 60)
+                        TabFrame.Title.TextColor3 = _initAcc
                         TabFrame.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
                         Container.Visible = true
+                        Library._activeTabIco = TabFrame.Ico
+                        Library._activeTabTitle = TabFrame.Title
                 end
 
                 AddConnection(TabFrame.MouseButton1Click, function()
                         for _, Tab in next, TabHolder:GetChildren() do
                                 if Tab:IsA("TextButton") and Tab:FindFirstChild("Title") and Tab:FindFirstChild("Ico") then
+                                        local _td = Library.Themes[Library.SelectedTheme].TextDark or Color3.fromRGB(160, 160, 160)
                                         Tab.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
-                                        TweenService:Create(Tab.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0.5, ImageColor3 = Color3.fromRGB(200, 200, 200)}):Play()
-                                        TweenService:Create(Tab.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0.5, TextColor3 = Color3.fromRGB(200, 200, 200)}):Play()
+                                        TweenService:Create(Tab.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0.5, ImageColor3 = _td}):Play()
+                                        TweenService:Create(Tab.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0.5, TextColor3 = _td}):Play()
                                 end
                         end
                         for _, ItemContainer in next, MainWindow:GetChildren() do
@@ -1277,10 +1327,13 @@ function Library:MakeWindow(WindowConfig)
                                         ItemContainer.Visible = false
                                 end
                         end
-                        TweenService:Create(TabFrame.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0, ImageColor3 = Color3.fromRGB(230, 180, 60)}):Play()
-                        TweenService:Create(TabFrame.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0, TextColor3 = Color3.fromRGB(230, 180, 60)}):Play()
+                        local _selAcc = Library.Themes[Library.SelectedTheme].Accent or Color3.fromRGB(230, 180, 60)
+                        TweenService:Create(TabFrame.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0, ImageColor3 = _selAcc}):Play()
+                        TweenService:Create(TabFrame.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0, TextColor3 = _selAcc}):Play()
                         TabFrame.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
                         Container.Visible = true
+                        Library._activeTabIco = TabFrame.Ico
+                        Library._activeTabTitle = TabFrame.Title
                 end)
 
                 AddConnection(TabFrame.MouseButton1Down, function()
@@ -2795,100 +2848,187 @@ function Library:MakeWindow(WindowConfig)
 
                         function ElementFunction:AddThemePicker()
                                 local ThemeNames = {}
-                                local ThemeColors = {
-                                        Default = Color3.fromRGB(50, 50, 50),
-                                        Light   = Color3.fromRGB(210, 210, 210),
-                                        Blurple = Color3.fromRGB(80, 80, 200),
-                                        Red     = Color3.fromRGB(180, 40, 40),
-                                        Ocean   = Color3.fromRGB(30, 100, 180),
-                                        Forest  = Color3.fromRGB(40, 130, 40),
-                                        Gold    = Color3.fromRGB(200, 160, 30)
-                                }
                                 for name, _ in pairs(Library.Themes) do
                                         table.insert(ThemeNames, name)
                                 end
                                 table.sort(ThemeNames)
 
+                                local SwatchSize = 34
+                                local SwatchPad = 5
+                                local LabelH = 11
+                                local CellH = SwatchSize + LabelH + 4
+                                local ColCount = 5
+                                local RowCount = math.ceil(#ThemeNames / ColCount)
+                                local GridH = RowCount * (CellH + SwatchPad) + SwatchPad
+                                local TotalH = 30 + GridH + 8
+
                                 local PickerFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255,255,255), 0, 8), {
-                                        Size = UDim2.new(1, 0, 0, 60),
+                                        Size = UDim2.new(1, 0, 0, TotalH),
                                         Parent = ItemParent,
-                                        BackgroundTransparency = 0.25
+                                        BackgroundTransparency = 0.25,
+                                        ClipsDescendants = true
                                 }), {
                                         AddThemeObject(SetProps(MakeElement("Label", "Theme", 15), {
-                                                Size = UDim2.new(1, -12, 0, 18),
-                                                Position = UDim2.new(0, 12, 0, 6),
+                                                Size = UDim2.new(1, -100, 0, 20),
+                                                Position = UDim2.new(0, 12, 0, 5),
                                                 Font = Enum.Font.FredokaOne,
-                                                Name = "Title"
+                                                Name = "PickerTitle"
                                         }), "Text"),
                                         AddThemeObject(MakeElement("Stroke"), "Stroke")
                                 }), "Second")
 
-                                Create("UIGradient", {
-                                        Color = ColorSequence.new({
-                                                ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 28)),
-                                                ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
-                                        }),
-                                        Rotation = 90
-                                }).Parent = PickerFrame
-
-                                local ButtonRow = Create("ScrollingFrame", {
-                                        Size = UDim2.new(1, -16, 0, 28),
-                                        Position = UDim2.new(0, 8, 0, 28),
+                                local ActiveLabel = Create("TextLabel", {
+                                        Size = UDim2.new(0, 90, 0, 20),
+                                        Position = UDim2.new(1, -100, 0, 5),
                                         BackgroundTransparency = 1,
-                                        ScrollBarThickness = 0,
-                                        CanvasSize = UDim2.new(0, 0, 0, 0),
+                                        Text = Library.SelectedTheme,
+                                        TextSize = 11,
+                                        Font = Enum.Font.GothamBold,
+                                        TextColor3 = Library.Themes[Library.SelectedTheme].Accent or Color3.fromRGB(230, 180, 60),
+                                        TextXAlignment = Enum.TextXAlignment.Right,
+                                        Name = "ActiveLabel",
                                         Parent = PickerFrame
                                 })
-                                local RowLayout = Create("UIListLayout", {
-                                        FillDirection = Enum.FillDirection.Horizontal,
-                                        SortOrder = Enum.SortOrder.LayoutOrder,
-                                        Padding = UDim.new(0, 5),
-                                        Parent = ButtonRow
+                                AddThemeObject(ActiveLabel, "Accent")
+
+                                local Divider = Create("Frame", {
+                                        Size = UDim2.new(1, -16, 0, 1),
+                                        Position = UDim2.new(0, 8, 0, 28),
+                                        BackgroundTransparency = 0.8,
+                                        BorderSizePixel = 0,
+                                        Parent = PickerFrame
+                                })
+                                AddThemeObject(Divider, "Stroke")
+
+                                local Grid = Create("Frame", {
+                                        Size = UDim2.new(1, -16, 0, GridH),
+                                        Position = UDim2.new(0, 8, 0, 34),
+                                        BackgroundTransparency = 1,
+                                        Parent = PickerFrame
                                 })
 
-                                RowLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-                                        ButtonRow.CanvasSize = UDim2.new(0, RowLayout.AbsoluteContentSize.X + 8, 0, 0)
-                                end)
+                                local GridLayout = Create("UIGridLayout", {
+                                        CellSize = UDim2.new(0, SwatchSize, 0, CellH),
+                                        CellPadding = UDim2.new(0, SwatchPad, 0, SwatchPad),
+                                        SortOrder = Enum.SortOrder.LayoutOrder,
+                                        FillDirectionMaxCells = ColCount,
+                                        Parent = Grid
+                                })
 
-                                for _, name in ipairs(ThemeNames) do
-                                        local ThemeColor = ThemeColors[name] or Color3.fromRGB(80, 80, 80)
+                                local AllButtons = {}
+
+                                local function RefreshOutlines()
+                                        for _, entry in pairs(AllButtons) do
+                                                local isSelected = (Library.SelectedTheme == entry.name)
+                                                local outline = entry.btn:FindFirstChild("Outline")
+                                                if outline then
+                                                        TweenService:Create(outline, TweenInfo.new(0.2, Enum.EasingStyle.Quint), {Thickness = isSelected and 2 or 0}):Play()
+                                                end
+                                                local check = entry.btn:FindFirstChild("Check")
+                                                if check then
+                                                        check.Visible = isSelected
+                                                end
+                                                local lbl = entry.btn:FindFirstChild("ThemeLbl")
+                                                if lbl then
+                                                        lbl.TextColor3 = isSelected
+                                                                and (Library.Themes[Library.SelectedTheme].Accent or Color3.fromRGB(230, 180, 60))
+                                                                or Color3.fromRGB(170, 170, 170)
+                                                end
+                                        end
+                                        ActiveLabel.Text = Library.SelectedTheme
+                                end
+
+                                for i, name in ipairs(ThemeNames) do
+                                        local td = Library.Themes[name]
+                                        local mainCol = td.Main or Color3.fromRGB(20, 20, 20)
+                                        local accentCol = td.Accent or Color3.fromRGB(230, 180, 60)
+                                        local strokeCol = td.Stroke or Color3.fromRGB(60, 60, 60)
+                                        local isSelected = (Library.SelectedTheme == name)
+
+                                        local Cell = Create("Frame", {
+                                                BackgroundTransparency = 1,
+                                                LayoutOrder = i,
+                                                Name = "Cell_" .. name,
+                                                Parent = Grid
+                                        })
+
                                         local Btn = Create("TextButton", {
-                                                Size = UDim2.new(0, 26, 0, 26),
-                                                BackgroundColor3 = ThemeColor,
+                                                Size = UDim2.new(1, 0, 0, SwatchSize),
+                                                BackgroundColor3 = mainCol,
                                                 BorderSizePixel = 0,
                                                 Text = "",
                                                 AutoButtonColor = false,
-                                                Parent = ButtonRow
+                                                Name = "Swatch",
+                                                Parent = Cell
                                         })
-                                        Create("UICorner", {CornerRadius = UDim.new(0, 6)}).Parent = Btn
-                                        Create("UIStroke", {
-                                                Color = Color3.fromRGB(255, 255, 255),
-                                                Thickness = Library.SelectedTheme == name and 2 or 0,
-                                                Transparency = 0.3,
-                                                Name = "Outline"
-                                        }).Parent = Btn
+                                        Create("UICorner", {CornerRadius = UDim.new(0, 7)}).Parent = Btn
 
-                                        local ThemeLabel = Create("TextLabel", {
-                                                Size = UDim2.new(1, 0, 0, 10),
-                                                Position = UDim2.new(0, 0, 1, 2),
+                                        local AccentStrip = Create("Frame", {
+                                                Size = UDim2.new(1, 0, 0, 6),
+                                                Position = UDim2.new(0, 0, 1, -6),
+                                                BackgroundColor3 = accentCol,
+                                                BorderSizePixel = 0,
+                                                Name = "AccentStrip",
+                                                Parent = Btn
+                                        })
+                                        Create("UICorner", {CornerRadius = UDim.new(0, 7)}).Parent = AccentStrip
+                                        Create("Frame", {
+                                                Size = UDim2.new(1, 0, 0.5, 0),
+                                                Position = UDim2.new(0, 0, 0, 0),
+                                                BackgroundColor3 = accentCol,
+                                                BorderSizePixel = 0,
+                                                Parent = AccentStrip
+                                        })
+
+                                        local Check = Create("ImageLabel", {
+                                                Size = UDim2.new(0, 14, 0, 14),
+                                                Position = UDim2.new(0.5, 0, 0.4, 0),
+                                                AnchorPoint = Vector2.new(0.5, 0.5),
                                                 BackgroundTransparency = 1,
-                                                Text = name,
-                                                TextSize = 8,
-                                                Font = Enum.Font.Gotham,
-                                                TextColor3 = Color3.fromRGB(200, 200, 200),
-                                                TextXAlignment = Enum.TextXAlignment.Center,
+                                                Image = "rbxassetid://6031094678",
+                                                ImageColor3 = Color3.fromRGB(255, 255, 255),
+                                                Visible = isSelected,
+                                                Name = "Check",
                                                 Parent = Btn
                                         })
 
-                                        Btn.MouseButton1Click:Connect(function()
-                                                for _, child in pairs(ButtonRow:GetChildren()) do
-                                                        if child:IsA("TextButton") then
-                                                                local outline = child:FindFirstChild("Outline")
-                                                                if outline then outline.Thickness = 0 end
-                                                        end
+                                        Create("UIStroke", {
+                                                Color = Color3.fromRGB(255, 255, 255),
+                                                Thickness = isSelected and 2 or 0,
+                                                Transparency = 0.2,
+                                                Name = "Outline",
+                                                Parent = Btn
+                                        })
+
+                                        local ThemeLbl = Create("TextLabel", {
+                                                Size = UDim2.new(1, 2, 0, LabelH),
+                                                Position = UDim2.new(-0.03, 0, 1, 2),
+                                                BackgroundTransparency = 1,
+                                                Text = name,
+                                                TextSize = 9,
+                                                Font = Enum.Font.GothamBold,
+                                                TextColor3 = isSelected
+                                                        and (td.Accent or Color3.fromRGB(230, 180, 60))
+                                                        or Color3.fromRGB(170, 170, 170),
+                                                TextXAlignment = Enum.TextXAlignment.Center,
+                                                Name = "ThemeLbl",
+                                                Parent = Cell
+                                        })
+
+                                        table.insert(AllButtons, {btn = Btn, name = name})
+
+                                        Btn.MouseEnter:Connect(function()
+                                                if Library.SelectedTheme ~= name then
+                                                        TweenService:Create(Btn, TweenInfo.new(0.15, Enum.EasingStyle.Quint), {BackgroundColor3 = strokeCol}):Play()
                                                 end
-                                                Btn.Outline.Thickness = 2
+                                        end)
+                                        Btn.MouseLeave:Connect(function()
+                                                TweenService:Create(Btn, TweenInfo.new(0.15, Enum.EasingStyle.Quint), {BackgroundColor3 = mainCol}):Play()
+                                        end)
+
+                                        Btn.MouseButton1Click:Connect(function()
                                                 Library:SetTheme(name)
+                                                RefreshOutlines()
                                                 local SoundService = game:GetService("SoundService")
                                                 local sound = Instance.new("Sound", SoundService)
                                                 sound.SoundId = "rbxassetid://6895079853"
