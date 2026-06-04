@@ -1142,31 +1142,73 @@ function Library:MakeWindow(WindowConfig)
                 TabConfig.Section = TabConfig.Section or ""
 
                 if TabConfig.Section ~= "" and not SectionHeaders[TabConfig.Section] then
-                        SectionHeaders[TabConfig.Section] = true
-                        local SectionBarFrame = SetProps(MakeElement("TFrame"), {
+                        SectionHeaders[TabConfig.Section] = {tabs = {}, collapsed = false}
+                        local _secName = TabConfig.Section
+                        local SectionBarFrame = SetProps(MakeElement("Button"), {
                                 Size = UDim2.new(1, 0, 0, 26),
-                                Parent = TabHolder
+                                Parent = TabHolder,
+                                BackgroundTransparency = 1
                         })
-                        local SectionBar = Instance.new("Frame")
-                        SectionBar.Size = UDim2.new(0, 3, 0, 13)
-                        SectionBar.Position = UDim2.new(0, 8, 0.5, 0)
-                        SectionBar.AnchorPoint = Vector2.new(0, 0.5)
-                        SectionBar.BackgroundColor3 = Color3.fromRGB(230, 180, 60)
-                        SectionBar.BorderSizePixel = 0
-                        local SectionBarCorner = Instance.new("UICorner")
-                        SectionBarCorner.CornerRadius = UDim.new(0, 100)
-                        SectionBarCorner.Parent = SectionBar
-                        SectionBar.Parent = SectionBarFrame
+                        local SectionAccent = Instance.new("Frame")
+                        SectionAccent.Size = UDim2.new(0, 3, 0, 13)
+                        SectionAccent.Position = UDim2.new(0, 8, 0.5, 0)
+                        SectionAccent.AnchorPoint = Vector2.new(0, 0.5)
+                        SectionAccent.BackgroundColor3 = Color3.fromRGB(230, 180, 60)
+                        SectionAccent.BorderSizePixel = 0
+                        local SectionAccentCorner = Instance.new("UICorner")
+                        SectionAccentCorner.CornerRadius = UDim.new(0, 100)
+                        SectionAccentCorner.Parent = SectionAccent
+                        SectionAccent.Parent = SectionBarFrame
                         local SectionLabel = Instance.new("TextLabel")
-                        SectionLabel.Size = UDim2.new(1, -20, 1, 0)
+                        SectionLabel.Size = UDim2.new(1, -36, 1, 0)
                         SectionLabel.Position = UDim2.new(0, 18, 0, 0)
                         SectionLabel.BackgroundTransparency = 1
-                        SectionLabel.Text = string.upper(TabConfig.Section)
+                        SectionLabel.Text = string.upper(_secName)
                         SectionLabel.TextColor3 = Color3.fromRGB(230, 180, 60)
                         SectionLabel.Font = Enum.Font.GothamBold
                         SectionLabel.TextSize = 11
                         SectionLabel.TextXAlignment = Enum.TextXAlignment.Left
                         SectionLabel.Parent = SectionBarFrame
+                        local ArrowFrame = Instance.new("Frame")
+                        ArrowFrame.Size = UDim2.new(0, 16, 0, 16)
+                        ArrowFrame.Position = UDim2.new(1, -20, 0.5, 0)
+                        ArrowFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+                        ArrowFrame.BackgroundColor3 = Color3.fromRGB(230, 180, 60)
+                        ArrowFrame.BackgroundTransparency = 0.75
+                        ArrowFrame.BorderSizePixel = 0
+                        local ArrowFrameCorner = Instance.new("UICorner")
+                        ArrowFrameCorner.CornerRadius = UDim.new(0, 4)
+                        ArrowFrameCorner.Parent = ArrowFrame
+                        ArrowFrame.Parent = SectionBarFrame
+                        local ArrowIco = Instance.new("ImageLabel")
+                        ArrowIco.Size = UDim2.new(0, 10, 0, 10)
+                        ArrowIco.Position = UDim2.new(0.5, 0, 0.5, 0)
+                        ArrowIco.AnchorPoint = Vector2.new(0.5, 0.5)
+                        ArrowIco.BackgroundTransparency = 1
+                        ArrowIco.Image = "rbxassetid://7072706796"
+                        ArrowIco.ImageColor3 = Color3.fromRGB(230, 180, 60)
+                        ArrowIco.Rotation = 0
+                        ArrowIco.Parent = ArrowFrame
+                        SectionHeaders[_secName].arrowIco = ArrowIco
+                        SectionHeaders[_secName].arrowFrame = ArrowFrame
+                        AddConnection(SectionBarFrame.MouseButton1Click, function()
+                                local _data = SectionHeaders[_secName]
+                                _data.collapsed = not _data.collapsed
+                                local _rot = _data.collapsed and -90 or 0
+                                local _bgTrans = _data.collapsed and 0.55 or 0.75
+                                TweenService:Create(ArrowIco, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Rotation = _rot}):Play()
+                                TweenService:Create(ArrowFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = _bgTrans}):Play()
+                                for _, _tf in ipairs(_data.tabs) do
+                                        _tf.Visible = not _data.collapsed
+                                end
+                        end)
+                        AddConnection(SectionBarFrame.MouseEnter, function()
+                                TweenService:Create(ArrowFrame, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5}):Play()
+                        end)
+                        AddConnection(SectionBarFrame.MouseLeave, function()
+                                local _data = SectionHeaders[TabConfig.Section]
+                                TweenService:Create(ArrowFrame, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = _data.collapsed and 0.55 or 0.75}):Play()
+                        end)
                 end
 
                 local TabFrame = SetChildren(SetProps(MakeElement("Button"), {
@@ -1191,6 +1233,10 @@ function Library:MakeWindow(WindowConfig)
 
                 if GetIcon(TabConfig.Icon) ~= nil then
                         TabFrame.Ico.Image = GetIcon(TabConfig.Icon)
+                end
+
+                if TabConfig.Section ~= "" and SectionHeaders[TabConfig.Section] then
+                        table.insert(SectionHeaders[TabConfig.Section].tabs, TabFrame)
                 end
 
                 local Container = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 5), {
@@ -1220,7 +1266,7 @@ function Library:MakeWindow(WindowConfig)
 
                 AddConnection(TabFrame.MouseButton1Click, function()
                         for _, Tab in next, TabHolder:GetChildren() do
-                                if Tab:IsA("TextButton") then
+                                if Tab:IsA("TextButton") and Tab:FindFirstChild("Title") and Tab:FindFirstChild("Ico") then
                                         Tab.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
                                         TweenService:Create(Tab.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0.5, ImageColor3 = Color3.fromRGB(200, 200, 200)}):Play()
                                         TweenService:Create(Tab.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0.5, TextColor3 = Color3.fromRGB(200, 200, 200)}):Play()
@@ -1828,6 +1874,241 @@ function Library:MakeWindow(WindowConfig)
                                         Library.Flags[DropdownConfig.Flag] = Dropdown
                                 end
                                 return Dropdown
+                        end
+
+                        function ElementFunction:AddSearchDropdown(DropdownConfig)
+                                DropdownConfig = DropdownConfig or {}
+                                DropdownConfig.Name = DropdownConfig.Name or "Search Dropdown"
+                                DropdownConfig.Options = DropdownConfig.Options or {}
+                                DropdownConfig.Default = DropdownConfig.Default or ""
+                                DropdownConfig.Callback = DropdownConfig.Callback or function() end
+                                DropdownConfig.Flag = DropdownConfig.Flag or nil
+                                DropdownConfig.Save = DropdownConfig.Save or false
+                                DropdownConfig.Placeholder = DropdownConfig.Placeholder or "Search..."
+
+                                local SDropdown = {Value = DropdownConfig.Default, Options = DropdownConfig.Options, Buttons = {}, Toggled = false, Type = "Dropdown", Save = DropdownConfig.Save}
+                                local MaxElements = 5
+
+                                if not table.find(SDropdown.Options, SDropdown.Value) then
+                                        SDropdown.Value = "..."
+                                end
+
+                                local SDList = MakeElement("List")
+
+                                local SDContainer = AddThemeObject(SetProps(SetChildren(MakeElement("ScrollFrame", Color3.fromRGB(40, 40, 40), 4), {
+                                        SDList
+                                }), {
+                                        Parent = ItemParent,
+                                        Position = UDim2.new(0, 0, 0, 70),
+                                        Size = UDim2.new(1, 0, 1, -70),
+                                        ClipsDescendants = true
+                                }), "Divider")
+
+                                local SDSearchBox = AddFontObject(AddThemeObject(Create("TextBox", {
+                                        Size = UDim2.new(1, -16, 1, 0),
+                                        Position = UDim2.new(0, 8, 0, 0),
+                                        BackgroundTransparency = 1,
+                                        TextColor3 = Color3.fromRGB(255, 255, 255),
+                                        PlaceholderColor3 = Color3.fromRGB(130, 130, 130),
+                                        PlaceholderText = DropdownConfig.Placeholder,
+                                        Font = Library.Fonts[Library.SelectedFont] or Library.Font,
+                                        TextXAlignment = Enum.TextXAlignment.Left,
+                                        TextSize = 13,
+                                        ClearTextOnFocus = false,
+                                        Text = ""
+                                }), "Text"))
+
+                                local SDSearchFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 6), {
+                                        Size = UDim2.new(1, 0, 0, 30),
+                                        BackgroundTransparency = 0.5
+                                }), {
+                                        AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://3926305904"), {
+                                                Size = UDim2.new(0, 14, 0, 14),
+                                                Position = UDim2.new(1, -20, 0.5, 0),
+                                                AnchorPoint = Vector2.new(0, 0.5),
+                                                ImageRectOffset = Vector2.new(964, 324),
+                                                ImageRectSize = Vector2.new(36, 36),
+                                                ImageTransparency = 0.4
+                                        }), "TextDark"),
+                                        SDSearchBox
+                                }), "Second")
+
+                                local Click = SetProps(MakeElement("Button"), {
+                                        Size = UDim2.new(1, 0, 1, 0)
+                                })
+
+                                local SDFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+                                        Size = UDim2.new(1, 0, 0, 38),
+                                        Parent = ItemParent,
+                                        ClipsDescendants = true,
+                                        BackgroundTransparency = 0.25
+                                }), {
+                                        SDContainer,
+                                        SetProps(SetChildren(MakeElement("TFrame"), {
+                                                AddThemeObject(SetProps(MakeElement("Label", DropdownConfig.Name, 15), {
+                                                        Size = UDim2.new(1, -12, 0, 38),
+                                                        Position = UDim2.new(0, 12, 0, 0),
+                                                        Font = Enum.Font.FredokaOne,
+                                                        Name = "Content"
+                                                }), "Text"),
+                                                AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://7072706796"), {
+                                                        Size = UDim2.new(0, 20, 0, 20),
+                                                        AnchorPoint = Vector2.new(0, 0.5),
+                                                        Position = UDim2.new(1, -30, 0, 19),
+                                                        ImageColor3 = Color3.fromRGB(240, 240, 240),
+                                                        Name = "Ico"
+                                                }), "TextDark"),
+                                                AddThemeObject(SetProps(MakeElement("Label", SDropdown.Value, 13), {
+                                                        Size = UDim2.new(1, -40, 0, 38),
+                                                        Font = Enum.Font.FredokaOne,
+                                                        Name = "Selected",
+                                                        TextXAlignment = Enum.TextXAlignment.Right
+                                                }), "TextDark"),
+                                                AddThemeObject(SetProps(MakeElement("Frame"), {
+                                                        Size = UDim2.new(1, 0, 0, 1),
+                                                        Position = UDim2.new(0, 0, 0, 37),
+                                                        Name = "Line",
+                                                        Visible = false,
+                                                        BackgroundTransparency = 0.4
+                                                }), "Stroke"),
+                                                Click
+                                        }), {
+                                                Size = UDim2.new(1, 0, 0, 38),
+                                                ClipsDescendants = true,
+                                                Name = "F"
+                                        }),
+                                        SDSearchFrame,
+                                        AddThemeObject(MakeElement("Stroke"), "Stroke"),
+                                        MakeElement("Corner")
+                                }), "Second")
+
+                                Create("UIGradient", {
+                                        Color = ColorSequence.new({
+                                                ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 28)),
+                                                ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
+                                        }),
+                                        Rotation = 90
+                                }).Parent = SDFrame
+
+                                SDSearchFrame.Position = UDim2.new(0, 6, 0, 42)
+                                SDSearchFrame.Size = UDim2.new(1, -12, 0, 26)
+                                SDSearchFrame.Parent = SDFrame
+
+                                AddConnection(SDList:GetPropertyChangedSignal("AbsoluteContentSize"), function()
+                                        SDContainer.CanvasSize = UDim2.new(0, 0, 0, SDList.AbsoluteContentSize.Y)
+                                end)
+
+                                local function FilterOptions(query)
+                                        query = string.lower(query or "")
+                                        for opt, btn in pairs(SDropdown.Buttons) do
+                                                if query == "" then
+                                                        btn.Visible = true
+                                                else
+                                                        btn.Visible = string.find(string.lower(opt), query, 1, true) ~= nil
+                                                end
+                                        end
+                                end
+
+                                local function AddSDOptions(Options)
+                                        for _, Option in pairs(Options) do
+                                                local OptionBtn = AddThemeObject(SetProps(SetChildren(MakeElement("Button", Color3.fromRGB(40, 40, 40)), {
+                                                        MakeElement("Corner", 0, 6),
+                                                        AddThemeObject(SetProps(MakeElement("Label", Option, 13, 0.4), {
+                                                                Position = UDim2.new(0, 8, 0, 0),
+                                                                Size = UDim2.new(1, -8, 1, 0),
+                                                                Name = "Title"
+                                                        }), "Text")
+                                                }), {
+                                                        Parent = SDContainer,
+                                                        Size = UDim2.new(1, 0, 0, 28),
+                                                        BackgroundTransparency = 0.8,
+                                                        ClipsDescendants = true
+                                                }), "Divider")
+
+                                                AddConnection(OptionBtn.MouseButton1Click, function()
+                                                        local SoundService = game:GetService("SoundService")
+                                                        local sound = Instance.new("Sound", SoundService)
+                                                        sound.SoundId = "rbxassetid://6895079853"
+                                                        sound.Volume = 1
+                                                        sound:Play()
+                                                        game:GetService("Debris"):AddItem(sound, 3)
+                                                        SDropdown:Set(Option)
+                                                        SDSearchBox.Text = ""
+                                                        FilterOptions("")
+                                                        SaveCfg(game.GameId)
+                                                end)
+
+                                                SDropdown.Buttons[Option] = OptionBtn
+                                        end
+                                end
+
+                                function SDropdown:Refresh(Options, Delete)
+                                        if Delete then
+                                                for _, v in pairs(SDropdown.Buttons) do v:Destroy() end
+                                                table.clear(SDropdown.Options)
+                                                table.clear(SDropdown.Buttons)
+                                        end
+                                        SDropdown.Options = Options
+                                        AddSDOptions(SDropdown.Options)
+                                end
+
+                                function SDropdown:Set(Value)
+                                        if not table.find(SDropdown.Options, Value) then
+                                                SDropdown.Value = "..."
+                                                SDFrame.F.Selected.Text = "..."
+                                                for _, v in pairs(SDropdown.Buttons) do
+                                                        TweenService:Create(v, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.8}):Play()
+                                                        TweenService:Create(v.Title, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {TextTransparency = 0.4}):Play()
+                                                end
+                                                return
+                                        end
+                                        SDropdown.Value = Value
+                                        SDFrame.F.Selected.Text = Value
+                                        for _, v in pairs(SDropdown.Buttons) do
+                                                TweenService:Create(v, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.8}):Play()
+                                                TweenService:Create(v.Title, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {TextTransparency = 0.4}):Play()
+                                        end
+                                        if SDropdown.Buttons[Value] then
+                                                TweenService:Create(SDropdown.Buttons[Value], TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.3}):Play()
+                                                TweenService:Create(SDropdown.Buttons[Value].Title, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
+                                        end
+                                        return DropdownConfig.Callback(SDropdown.Value)
+                                end
+
+                                AddConnection(SDSearchBox:GetPropertyChangedSignal("Text"), function()
+                                        FilterOptions(SDSearchBox.Text)
+                                end)
+
+                                AddConnection(Click.MouseButton1Click, function()
+                                        SDropdown.Toggled = not SDropdown.Toggled
+                                        SDFrame.F.Line.Visible = SDropdown.Toggled
+                                        SDSearchFrame.Visible = SDropdown.Toggled
+                                        TweenService:Create(SDFrame.F.Ico, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {Rotation = SDropdown.Toggled and 180 or 0}):Play()
+                                        local searchH = SDropdown.Toggled and 34 or 0
+                                        local listH = SDropdown.Toggled and (math.min(#SDropdown.Options, MaxElements) * 28) or 0
+                                        TweenService:Create(SDFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, 38 + searchH + listH)}):Play()
+                                        if not SDropdown.Toggled then
+                                                SDSearchBox.Text = ""
+                                                FilterOptions("")
+                                        end
+                                end)
+
+                                AddConnection(Click.MouseButton1Down, function()
+                                        local SoundService = game:GetService("SoundService")
+                                        local sound = Instance.new("Sound", SoundService)
+                                        sound.SoundId = "rbxassetid://6895079853"
+                                        sound.Volume = 1
+                                        sound:Play()
+                                        game:GetService("Debris"):AddItem(sound, 3)
+                                end)
+
+                                SDSearchFrame.Visible = false
+                                SDropdown:Refresh(SDropdown.Options, false)
+                                SDropdown:Set(SDropdown.Value)
+                                if DropdownConfig.Flag then
+                                        Library.Flags[DropdownConfig.Flag] = SDropdown
+                                end
+                                return SDropdown
                         end
 
                         function ElementFunction:AddMultiDropdown(DropdownConfig)
