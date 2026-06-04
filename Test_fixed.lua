@@ -194,6 +194,15 @@ local Library = {
                         Text = Color3.fromRGB(180, 255, 180),
                         TextDark = Color3.fromRGB(60, 180, 60),
                         Accent = Color3.fromRGB(0, 230, 60)
+                },
+                Beanz = {
+                        Main = Color3.fromRGB(6, 5, 0),
+                        Second = Color3.fromRGB(16, 13, 0),
+                        Stroke = Color3.fromRGB(200, 155, 0),
+                        Divider = Color3.fromRGB(40, 32, 0),
+                        Text = Color3.fromRGB(255, 248, 210),
+                        TextDark = Color3.fromRGB(200, 168, 70),
+                        Accent = Color3.fromRGB(245, 190, 0)
                 }
         },
         Fonts = {
@@ -210,7 +219,7 @@ local Library = {
                 Cartoon = Enum.Font.Cartoon,
                 Code = Enum.Font.Code
         },
-        SelectedTheme = "Default",
+        SelectedTheme = "Mono",
         SelectedFont = "Gotham",
         Folder = nil,
         SaveCfg = false,
@@ -946,6 +955,132 @@ function Library:MakeWindow(WindowConfig)
 
         MakeDraggable(DragPoint, MainWindow)
 
+        -- ── Xeioa Tags ────────────────────────────────────────────────────
+        if WindowConfig.Tags and #WindowConfig.Tags > 0 then
+                local _tagX = WindowConfig.ShowIcon and 50 or 25
+                local TagsRow = Create("Frame", {
+                        Parent = MainWindow.TopBar,
+                        Size = UDim2.new(0, 0, 0, 18),
+                        Position = UDim2.new(0, _tagX, 0.5, 0),
+                        AnchorPoint = Vector2.new(0, 0.5),
+                        AutomaticSize = Enum.AutomaticSize.X,
+                        BackgroundTransparency = 1,
+                        Name = "XeioaTagsRow",
+                        ZIndex = 5
+                })
+                Create("UIListLayout", {
+                        FillDirection = Enum.FillDirection.Horizontal,
+                        Padding = UDim.new(0, 4),
+                        VerticalAlignment = Enum.VerticalAlignment.Center,
+                        SortOrder = Enum.SortOrder.LayoutOrder,
+                        Parent = TagsRow
+                })
+                local _defTagCol = {
+                        FPS     = Color3.fromRGB(80, 220, 100),
+                        Ping    = Color3.fromRGB(80, 180, 255),
+                        GitHub  = Color3.fromRGB(190, 190, 190),
+                        Discord = Color3.fromRGB(114, 137, 218),
+                        Custom  = Library.Themes[Library.SelectedTheme].Accent or Color3.fromRGB(230, 180, 60)
+                }
+                local function _mkPill(td, order)
+                        local col = td.Color or _defTagCol[td.Type] or Color3.fromRGB(150,150,150)
+                        local Pill = Create("Frame", {
+                                Size = UDim2.new(0, 0, 1, 0),
+                                AutomaticSize = Enum.AutomaticSize.X,
+                                BackgroundColor3 = col,
+                                BackgroundTransparency = 0.78,
+                                BorderSizePixel = 0,
+                                LayoutOrder = order,
+                                Parent = TagsRow
+                        })
+                        Create("UICorner", {CornerRadius = UDim.new(1, 0)}).Parent = Pill
+                        Create("UIStroke", {Color = col, Thickness = 1, Transparency = 0.45}).Parent = Pill
+                        Create("UIPadding", {
+                                PaddingLeft = UDim.new(0, 7), PaddingRight = UDim.new(0, 7),
+                                PaddingTop = UDim.new(0, 1),  PaddingBottom = UDim.new(0, 1)
+                        }).Parent = Pill
+                        Create("UIListLayout", {
+                                FillDirection = Enum.FillDirection.Horizontal,
+                                Padding = UDim.new(0, 4),
+                                VerticalAlignment = Enum.VerticalAlignment.Center,
+                                SortOrder = Enum.SortOrder.LayoutOrder,
+                                Parent = Pill
+                        })
+                        local Dot = Create("Frame", {
+                                Size = UDim2.new(0, 5, 0, 5),
+                                BackgroundColor3 = col,
+                                BorderSizePixel = 0,
+                                LayoutOrder = 1,
+                                Parent = Pill
+                        })
+                        Create("UICorner", {CornerRadius = UDim.new(1, 0)}).Parent = Dot
+                        local Lbl = Create("TextLabel", {
+                                Size = UDim2.new(0, 0, 1, 0),
+                                AutomaticSize = Enum.AutomaticSize.X,
+                                BackgroundTransparency = 1,
+                                TextColor3 = Color3.fromRGB(230, 230, 230),
+                                TextSize = 10,
+                                Font = Enum.Font.GothamBold,
+                                Text = td.Text or td.Type or "Tag",
+                                LayoutOrder = 2,
+                                Parent = Pill
+                        })
+                        return Lbl, Dot
+                end
+                for i, td in ipairs(WindowConfig.Tags) do
+                        local Lbl, Dot = _mkPill(td, i)
+                        if td.Type == "FPS" then
+                                Lbl.Text = "FPS --"
+                                local _fc, _ft = 0, 0
+                                AddConnection(RunService.RenderStepped, function(dt)
+                                        _fc = _fc + 1; _ft = _ft + dt
+                                        if _ft >= 0.5 then
+                                                local fps = math.floor(_fc / _ft)
+                                                Lbl.Text = "FPS " .. fps
+                                                local col = fps >= 55 and Color3.fromRGB(80,220,100) or fps >= 30 and Color3.fromRGB(255,200,60) or Color3.fromRGB(255,80,80)
+                                                Lbl.TextColor3 = col; Dot.BackgroundColor3 = col
+                                                _fc, _ft = 0, 0
+                                        end
+                                end)
+                        elseif td.Type == "Ping" then
+                                Lbl.Text = "PING --"
+                                local _pt = 0
+                                AddConnection(RunService.Heartbeat, function(dt)
+                                        _pt = _pt + dt
+                                        if _pt >= 1 then
+                                                _pt = 0
+                                                pcall(function()
+                                                        local p = math.floor(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())
+                                                        Lbl.Text = "PING " .. p .. "ms"
+                                                        local col = p <= 80 and Color3.fromRGB(80,220,100) or p <= 150 and Color3.fromRGB(255,200,60) or Color3.fromRGB(255,80,80)
+                                                        Lbl.TextColor3 = col; Dot.BackgroundColor3 = col
+                                                end)
+                                        end
+                                end)
+                        elseif td.Type == "GitHub" then
+                                Lbl.Text = td.Text or "GitHub"
+                        elseif td.Type == "Discord" then
+                                Lbl.Text = td.Text or "Discord"
+                        elseif td.Type == "Custom" then
+                                Lbl.Text = td.Text or "Tag"
+                                if td.UpdateFn then
+                                        local _ut, _ui = 0, td.Interval or 1
+                                        AddConnection(RunService.Heartbeat, function(dt)
+                                                _ut = _ut + dt
+                                                if _ut >= _ui then
+                                                        _ut = 0
+                                                        pcall(function()
+                                                                local r = td.UpdateFn()
+                                                                if r then Lbl.Text = tostring(r) end
+                                                        end)
+                                                end
+                                        end)
+                                end
+                        end
+                end
+        end
+        -- ── End Tags ──────────────────────────────────────────────────────
+
         local MobileReopenButton = SetChildren(SetProps(MakeElement("Button"), {
                 Parent = Container,
                 Size = UDim2.new(0, 40, 0, 40),
@@ -1252,7 +1387,7 @@ function Library:MakeWindow(WindowConfig)
                         SectionHeaders[TabConfig.Section] = {tabs = {}, collapsed = false}
                         local _secName = TabConfig.Section
                         local SectionBarFrame = SetProps(MakeElement("Button"), {
-                                Size = UDim2.new(1, 0, 0, 26),
+                                Size = UDim2.new(1, 0, 0, 28),
                                 Parent = TabHolder,
                                 BackgroundTransparency = 1
                         })
@@ -1276,19 +1411,28 @@ function Library:MakeWindow(WindowConfig)
                         SectionLabel.TextXAlignment = Enum.TextXAlignment.Left
                         SectionLabel.Parent = SectionBarFrame
                         AddThemeObject(SectionLabel, "Accent")
+                        local SectionHover = Instance.new("Frame")
+                        SectionHover.Size = UDim2.new(1, 0, 1, 0)
+                        SectionHover.BackgroundTransparency = 1
+                        SectionHover.BorderSizePixel = 0
+                        SectionHover.ZIndex = 0
+                        Instance.new("UICorner", SectionHover).CornerRadius = UDim.new(0, 5)
+                        SectionHover.Parent = SectionBarFrame
+                        AddThemeObject(SectionHover, "Second")
+
                         local ArrowFrame = Instance.new("Frame")
-                        ArrowFrame.Size = UDim2.new(0, 16, 0, 16)
-                        ArrowFrame.Position = UDim2.new(1, -20, 0.5, 0)
+                        ArrowFrame.Size = UDim2.new(0, 20, 0, 20)
+                        ArrowFrame.Position = UDim2.new(1, -22, 0.5, 0)
                         ArrowFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-                        ArrowFrame.BackgroundTransparency = 0.75
+                        ArrowFrame.BackgroundTransparency = 0.65
                         ArrowFrame.BorderSizePixel = 0
                         local ArrowFrameCorner = Instance.new("UICorner")
-                        ArrowFrameCorner.CornerRadius = UDim.new(0, 4)
+                        ArrowFrameCorner.CornerRadius = UDim.new(1, 0)
                         ArrowFrameCorner.Parent = ArrowFrame
                         ArrowFrame.Parent = SectionBarFrame
                         AddThemeObject(ArrowFrame, "Accent")
                         local ArrowIco = Instance.new("ImageLabel")
-                        ArrowIco.Size = UDim2.new(0, 10, 0, 10)
+                        ArrowIco.Size = UDim2.new(0, 12, 0, 12)
                         ArrowIco.Position = UDim2.new(0.5, 0, 0.5, 0)
                         ArrowIco.AnchorPoint = Vector2.new(0.5, 0.5)
                         ArrowIco.BackgroundTransparency = 1
@@ -1310,11 +1454,13 @@ function Library:MakeWindow(WindowConfig)
                                 end
                         end)
                         AddConnection(SectionBarFrame.MouseEnter, function()
-                                TweenService:Create(ArrowFrame, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5}):Play()
+                                TweenService:Create(ArrowFrame, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.4}):Play()
+                                TweenService:Create(SectionHover, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.82}):Play()
                         end)
                         AddConnection(SectionBarFrame.MouseLeave, function()
                                 local _data = SectionHeaders[TabConfig.Section]
-                                TweenService:Create(ArrowFrame, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = _data.collapsed and 0.55 or 0.75}):Play()
+                                TweenService:Create(ArrowFrame, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = _data.collapsed and 0.55 or 0.65}):Play()
+                                TweenService:Create(SectionHover, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {BackgroundTransparency = 1}):Play()
                         end)
                 end
 
