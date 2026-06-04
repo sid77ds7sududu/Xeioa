@@ -354,7 +354,7 @@ local Library = {
                 Cartoon = Enum.Font.Cartoon,
                 Code = Enum.Font.Code
         },
-        SelectedTheme = "Default",
+        SelectedTheme = "Carbon",
         SelectedFont = "Gotham",
         Folder = nil,
         SaveCfg = false,
@@ -1092,12 +1092,13 @@ function Library:MakeWindow(WindowConfig)
 
         -- ── Xeioa Tags ────────────────────────────────────────────────────
         if WindowConfig.Tags and #WindowConfig.Tags > 0 then
-                local _tagX = WindowConfig.ShowIcon and 50 or 25
+                -- Narrow the title so tags never overlap it
+                WindowName.Size = UDim2.new(0.52, 0, 2, 0)
                 local TagsRow = Create("Frame", {
                         Parent = MainWindow.TopBar,
-                        Size = UDim2.new(0, 0, 0, 16),
-                        Position = UDim2.new(0, _tagX, 1, -10),
-                        AnchorPoint = Vector2.new(0, 1),
+                        Size = UDim2.new(0, 0, 0, 18),
+                        Position = UDim2.new(1, -100, 0.5, 0),
+                        AnchorPoint = Vector2.new(1, 0.5),
                         AutomaticSize = Enum.AutomaticSize.X,
                         BackgroundTransparency = 1,
                         Name = "XeioaTagsRow",
