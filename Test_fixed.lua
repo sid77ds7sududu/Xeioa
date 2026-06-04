@@ -195,7 +195,7 @@ local Library = {
                         TextDark = Color3.fromRGB(60, 180, 60),
                         Accent = Color3.fromRGB(0, 230, 60)
                 },
-                Beanz = {
+                Beanzz = {
                         Main = Color3.fromRGB(6, 5, 0),
                         Second = Color3.fromRGB(16, 13, 0),
                         Stroke = Color3.fromRGB(200, 155, 0),
@@ -203,6 +203,141 @@ local Library = {
                         Text = Color3.fromRGB(255, 248, 210),
                         TextDark = Color3.fromRGB(200, 168, 70),
                         Accent = Color3.fromRGB(245, 190, 0)
+                },
+                Neon = {
+                        Main = Color3.fromRGB(4, 2, 12),
+                        Second = Color3.fromRGB(10, 6, 24),
+                        Stroke = Color3.fromRGB(180, 0, 255),
+                        Divider = Color3.fromRGB(30, 10, 55),
+                        Text = Color3.fromRGB(240, 220, 255),
+                        TextDark = Color3.fromRGB(170, 100, 240),
+                        Accent = Color3.fromRGB(200, 0, 255)
+                },
+                Vapor = {
+                        Main = Color3.fromRGB(12, 4, 18),
+                        Second = Color3.fromRGB(24, 8, 34),
+                        Stroke = Color3.fromRGB(255, 80, 180),
+                        Divider = Color3.fromRGB(55, 16, 60),
+                        Text = Color3.fromRGB(255, 230, 255),
+                        TextDark = Color3.fromRGB(220, 140, 210),
+                        Accent = Color3.fromRGB(255, 80, 200)
+                },
+                Ice = {
+                        Main = Color3.fromRGB(220, 235, 245),
+                        Second = Color3.fromRGB(200, 220, 238),
+                        Stroke = Color3.fromRGB(120, 180, 230),
+                        Divider = Color3.fromRGB(180, 210, 235),
+                        Text = Color3.fromRGB(20, 40, 60),
+                        TextDark = Color3.fromRGB(80, 130, 180),
+                        Accent = Color3.fromRGB(60, 160, 240)
+                },
+                Sand = {
+                        Main = Color3.fromRGB(22, 16, 8),
+                        Second = Color3.fromRGB(38, 28, 14),
+                        Stroke = Color3.fromRGB(190, 150, 80),
+                        Divider = Color3.fromRGB(65, 48, 22),
+                        Text = Color3.fromRGB(255, 245, 220),
+                        TextDark = Color3.fromRGB(200, 170, 110),
+                        Accent = Color3.fromRGB(210, 160, 70)
+                },
+                Toxic = {
+                        Main = Color3.fromRGB(4, 12, 2),
+                        Second = Color3.fromRGB(8, 22, 4),
+                        Stroke = Color3.fromRGB(140, 255, 0),
+                        Divider = Color3.fromRGB(18, 45, 6),
+                        Text = Color3.fromRGB(220, 255, 200),
+                        TextDark = Color3.fromRGB(140, 220, 60),
+                        Accent = Color3.fromRGB(160, 255, 0)
+                },
+                Lava = {
+                        Main = Color3.fromRGB(16, 4, 0),
+                        Second = Color3.fromRGB(30, 8, 0),
+                        Stroke = Color3.fromRGB(255, 80, 20),
+                        Divider = Color3.fromRGB(60, 16, 0),
+                        Text = Color3.fromRGB(255, 230, 215),
+                        TextDark = Color3.fromRGB(230, 140, 80),
+                        Accent = Color3.fromRGB(255, 90, 20)
+                },
+                Navy = {
+                        Main = Color3.fromRGB(4, 8, 20),
+                        Second = Color3.fromRGB(8, 16, 36),
+                        Stroke = Color3.fromRGB(40, 80, 180),
+                        Divider = Color3.fromRGB(14, 28, 60),
+                        Text = Color3.fromRGB(210, 225, 255),
+                        TextDark = Color3.fromRGB(100, 140, 220),
+                        Accent = Color3.fromRGB(70, 130, 255)
+                },
+                Ember = {
+                        Main = Color3.fromRGB(16, 6, 2),
+                        Second = Color3.fromRGB(30, 12, 4),
+                        Stroke = Color3.fromRGB(240, 100, 40),
+                        Divider = Color3.fromRGB(60, 22, 8),
+                        Text = Color3.fromRGB(255, 235, 220),
+                        TextDark = Color3.fromRGB(220, 150, 100),
+                        Accent = Color3.fromRGB(245, 110, 50)
+                },
+                Abyss = {
+                        Main = Color3.fromRGB(2, 4, 10),
+                        Second = Color3.fromRGB(4, 8, 20),
+                        Stroke = Color3.fromRGB(0, 160, 200),
+                        Divider = Color3.fromRGB(6, 18, 38),
+                        Text = Color3.fromRGB(200, 240, 255),
+                        TextDark = Color3.fromRGB(80, 180, 210),
+                        Accent = Color3.fromRGB(0, 190, 230)
+                },
+                Chrome = {
+                        Main = Color3.fromRGB(18, 18, 20),
+                        Second = Color3.fromRGB(30, 30, 34),
+                        Stroke = Color3.fromRGB(200, 200, 210),
+                        Divider = Color3.fromRGB(50, 50, 56),
+                        Text = Color3.fromRGB(240, 240, 245),
+                        TextDark = Color3.fromRGB(170, 170, 180),
+                        Accent = Color3.fromRGB(210, 210, 220)
+                },
+                Cobalt = {
+                        Main = Color3.fromRGB(4, 10, 24),
+                        Second = Color3.fromRGB(8, 20, 45),
+                        Stroke = Color3.fromRGB(30, 120, 255),
+                        Divider = Color3.fromRGB(12, 36, 80),
+                        Text = Color3.fromRGB(215, 230, 255),
+                        TextDark = Color3.fromRGB(100, 160, 240),
+                        Accent = Color3.fromRGB(40, 140, 255)
+                },
+                Sakura = {
+                        Main = Color3.fromRGB(235, 215, 225),
+                        Second = Color3.fromRGB(220, 198, 212),
+                        Stroke = Color3.fromRGB(220, 120, 160),
+                        Divider = Color3.fromRGB(200, 180, 192),
+                        Text = Color3.fromRGB(50, 20, 35),
+                        TextDark = Color3.fromRGB(160, 80, 110),
+                        Accent = Color3.fromRGB(230, 100, 145)
+                },
+                Blood = {
+                        Main = Color3.fromRGB(12, 2, 2),
+                        Second = Color3.fromRGB(24, 4, 4),
+                        Stroke = Color3.fromRGB(180, 0, 0),
+                        Divider = Color3.fromRGB(50, 6, 6),
+                        Text = Color3.fromRGB(255, 215, 215),
+                        TextDark = Color3.fromRGB(200, 100, 100),
+                        Accent = Color3.fromRGB(200, 0, 0)
+                },
+                Olive = {
+                        Main = Color3.fromRGB(10, 12, 4),
+                        Second = Color3.fromRGB(20, 24, 8),
+                        Stroke = Color3.fromRGB(120, 140, 30),
+                        Divider = Color3.fromRGB(35, 40, 12),
+                        Text = Color3.fromRGB(230, 240, 200),
+                        TextDark = Color3.fromRGB(150, 175, 80),
+                        Accent = Color3.fromRGB(150, 180, 30)
+                },
+                Carbon = {
+                        Main = Color3.fromRGB(8, 8, 8),
+                        Second = Color3.fromRGB(16, 16, 16),
+                        Stroke = Color3.fromRGB(90, 90, 90),
+                        Divider = Color3.fromRGB(28, 28, 28),
+                        Text = Color3.fromRGB(235, 235, 235),
+                        TextDark = Color3.fromRGB(150, 150, 150),
+                        Accent = Color3.fromRGB(180, 180, 180)
                 }
         },
         Fonts = {
@@ -219,7 +354,7 @@ local Library = {
                 Cartoon = Enum.Font.Cartoon,
                 Code = Enum.Font.Code
         },
-        SelectedTheme = "Mono",
+        SelectedTheme = "Default",
         SelectedFont = "Gotham",
         Folder = nil,
         SaveCfg = false,
@@ -960,9 +1095,9 @@ function Library:MakeWindow(WindowConfig)
                 local _tagX = WindowConfig.ShowIcon and 50 or 25
                 local TagsRow = Create("Frame", {
                         Parent = MainWindow.TopBar,
-                        Size = UDim2.new(0, 0, 0, 18),
-                        Position = UDim2.new(0, _tagX, 0.5, 0),
-                        AnchorPoint = Vector2.new(0, 0.5),
+                        Size = UDim2.new(0, 0, 0, 16),
+                        Position = UDim2.new(0, _tagX, 1, -10),
+                        AnchorPoint = Vector2.new(0, 1),
                         AutomaticSize = Enum.AutomaticSize.X,
                         BackgroundTransparency = 1,
                         Name = "XeioaTagsRow",
