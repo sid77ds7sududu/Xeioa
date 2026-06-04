@@ -767,7 +767,7 @@ function Library:MakeWindow(WindowConfig)
         end
 
         local SectionHeaders = {}
-        local TabSidePanel = AddThemeObject(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 0), {
+        local TabSidePanel = AddThemeObject(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 10), {
                 Size = UDim2.new(0, 150, 1, -50),
                 Position = UDim2.new(0, 0, 0, 50),
                 BackgroundTransparency = 0.025,
@@ -3057,7 +3057,7 @@ function Library:MakeWindow(WindowConfig)
 
                                         local ThemeLbl = Create("TextLabel", {
                                                 Size = UDim2.new(1, 0, 0, LabelH),
-                                                Position = UDim2.new(0, 0, 1, 2),
+                                                Position = UDim2.new(0, 0, 0, 36),
                                                 BackgroundTransparency = 1,
                                                 Text = name,
                                                 TextSize = 9,
