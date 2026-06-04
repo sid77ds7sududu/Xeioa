@@ -406,7 +406,7 @@ local function LoadCfg(Config)
                         end
                 end)
         end)
-        
+
         if not success then
                 warn("Config Load Error:", err)
         end
@@ -416,12 +416,12 @@ local function SaveCfg(Name)
         if not writefile or not makefolder or not isfolder then
                 return false
         end
-        
+
         local success, err = pcall(function()
                 if not isfolder(Library.Folder) then
                         makefolder(Library.Folder)
                 end
-                
+
                 local Data = {}
                 for i,v in pairs(Library.Flags) do
                         if v.Save then
@@ -432,15 +432,15 @@ local function SaveCfg(Name)
                                 end
                         end
                 end
-                
+
                 writefile(Library.Folder .. "/" .. Name .. ".txt", HttpService:JSONEncode(Data))
         end)
-        
+
         if not success then
                 warn("Config Save Error:", err)
                 return false
         end
-        
+
         return true
 end
 
@@ -551,7 +551,7 @@ CreateElement("Image", function(ImageID)
 
         if GetIcon(ImageID) ~= nil then
                 ImageNew.Image = GetIcon(ImageID)
-        end     
+        end
 
         return ImageNew
 end)
@@ -608,7 +608,7 @@ function Library:MakeNotification(NotificationConfig)
                 })
 
                 local NotificationFrame = SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(12, 12, 12), 0, 10), {
-                        Parent = NotificationParent, 
+                        Parent = NotificationParent,
                         Size = UDim2.new(1, 0, 0, 0),
                         Position = UDim2.new(1, -55, 0, 0),
                         BackgroundTransparency = 0.1,
@@ -658,7 +658,7 @@ function Library:Init()
                         warn("File functions not available")
                         return
                 end
-                
+
                 pcall(function()
                         if isfile(Library.Folder .. "/" .. game.GameId .. ".txt") then
                                 LoadCfg(readfile(Library.Folder .. "/" .. game.GameId .. ".txt"))
@@ -717,15 +717,30 @@ function Library:MakeWindow(WindowConfig)
         if WindowConfig.SaveConfig then
                 if not isfolder(WindowConfig.ConfigFolder) then
                         makefolder(WindowConfig.ConfigFolder)
-                end     
+                end
         end
 
+        local SectionHeaders = {}
+        local TabSidePanel = AddThemeObject(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 0), {
+                Size = UDim2.new(0, 150, 1, -50),
+                Position = UDim2.new(0, 0, 0, 50),
+                BackgroundTransparency = 0.025,
+                ClipsDescendants = true
+        }), "Second")
+        AddThemeObject(SetProps(MakeElement("Frame"), {
+                Size = UDim2.new(0, 1, 1, 0),
+                Position = UDim2.new(1, -1, 0, 0),
+                BackgroundTransparency = 0.4
+        }), "Stroke").Parent = TabSidePanel
+
         local TabHolder = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 4), {
-                Size = UDim2.new(1, 0, 1, -50)
+                Size = UDim2.new(1, 0, 1, 0),
+                BackgroundTransparency = 1
         }), {
-                MakeElement("List"),
-                MakeElement("Padding", 8, 0, 0, 8)
+                MakeElement("List", 0, 0),
+                MakeElement("Padding", 10, 0, 10, 8)
         }), "Divider")
+        TabHolder.Parent = TabSidePanel
 
         AddConnection(TabHolder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
                 TabHolder.CanvasSize = UDim2.new(0, 0, 0, TabHolder.UIListLayout.AbsoluteContentSize.Y + 16)
@@ -757,70 +772,7 @@ function Library:MakeWindow(WindowConfig)
                 Size = UDim2.new(1, 0, 0, 50)
         })
 
-        local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 10), {
-                Size = UDim2.new(0, 150, 1, -50),
-                Position = UDim2.new(0, 0, 0, 50),
-                BackgroundTransparency = 0.025
-        }), {
-                AddThemeObject(SetProps(MakeElement("Frame"), {
-                        Size = UDim2.new(1, 0, 0, 10),
-                        Position = UDim2.new(0, 0, 0, 0),
-                        BackgroundTransparency = 0.25
-                }), "Second"), 
-                AddThemeObject(SetProps(MakeElement("Frame"), {
-                        Size = UDim2.new(0, 10, 1, 0),
-                        Position = UDim2.new(1, -10, 0, 0),
-                        BackgroundTransparency = 0.25
-                }), "Second"), 
-                AddThemeObject(SetProps(MakeElement("Frame"), {
-                        Size = UDim2.new(0, 1, 1, 0),
-                        Position = UDim2.new(1, -1, 0, 0),
-                        BackgroundTransparency = 0.4
-                }), "Stroke"), 
-                TabHolder,
-                SetChildren(SetProps(MakeElement("TFrame"), {
-                        Size = UDim2.new(1, 0, 0, 50),
-                        Position = UDim2.new(0, 0, 1, -50)
-                }), {
-                        AddThemeObject(SetProps(MakeElement("Frame"), {
-                                Size = UDim2.new(1, 0, 0, 1),
-                                BackgroundTransparency = 0.4
-                        }), "Stroke"), 
-                        AddThemeObject(SetChildren(SetProps(MakeElement("Frame"), {
-                                AnchorPoint = Vector2.new(0, 0.5),
-                                Size = UDim2.new(0, 32, 0, 32),
-                                Position = UDim2.new(0, 10, 0.5, 0),
-                                BackgroundTransparency = 0.3
-                        }), {
-                                SetProps(MakeElement("Image", "https://www.roblox.com/headshot-thumbnail/image?userId=".. LocalPlayer.UserId .."&width=420&height=420&format=png"), {
-                                        Size = UDim2.new(1, 0, 1, 0)
-                                }),
-                                AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://4031889928"), {
-                                        Size = UDim2.new(1, 0, 1, 0),
-                                }), "Second"),
-                                MakeElement("Corner", 1)
-                        }), "Divider"),
-                        SetChildren(SetProps(MakeElement("TFrame"), {
-                                AnchorPoint = Vector2.new(0, 0.5),
-                                Size = UDim2.new(0, 32, 0, 32),
-                                Position = UDim2.new(0, 10, 0.5, 0)
-                        }), {
-                                AddThemeObject(MakeElement("Stroke"), "Stroke"),
-                                MakeElement("Corner", 1)
-                        }),
-                        AddThemeObject(SetProps(MakeElement("Label", "Xeioa", WindowConfig.HidePremium and 14 or 13), {
-                                Size = UDim2.new(1, -60, 0, 13),
-                                Position = WindowConfig.HidePremium and UDim2.new(0, 50, 0, 19) or UDim2.new(0, 50, 0, 12),
-                                Font = Enum.Font.FredokaOne,
-                                ClipsDescendants = true
-                        }), "Text"),
-                        AddThemeObject(SetProps(MakeElement("Label", "Join Xeioa", 12), {
-                                Size = UDim2.new(1, -60, 0, 12),
-                                Position = UDim2.new(0, 50, 1, -25),
-                                Visible = not WindowConfig.HidePremium
-                        }), "TextDark")
-                }),
-        }), "Second")
+
 
         local WindowName = AddThemeObject(SetProps(MakeElement("Label", WindowConfig.Name, 14), {
                 Size = UDim2.new(1, -30, 2, 0),
@@ -858,13 +810,13 @@ function Library:MakeWindow(WindowConfig)
                                         Size = UDim2.new(0, 1, 1, 0),
                                         Position = UDim2.new(0.5, 0, 0, 0),
                                         BackgroundTransparency = 0.4
-                                }), "Stroke"), 
+                                }), "Stroke"),
                                 CloseBtn,
                                 MinimizeBtn
-                        }), "Second"), 
+                        }), "Second"),
                 }),
                 DragPoint,
-                WindowStuff
+                TabSidePanel
         }), "Main")
 
         local TopBarGradient = Create("UIGradient", {
@@ -883,7 +835,7 @@ function Library:MakeWindow(WindowConfig)
                         Position = UDim2.new(0, 25, 0, 15)
                 })
                 WindowIcon.Parent = MainWindow.TopBar
-        end     
+        end
 
         MakeDraggable(DragPoint, MainWindow)
 
@@ -953,7 +905,7 @@ function Library:MakeWindow(WindowConfig)
                         MinimizeBtn.Ico.Image = "rbxassetid://7072719338"
                         wait(.02)
                         MainWindow.ClipsDescendants = false
-                        WindowStuff.Visible = true
+                        TabSidePanel.Visible = true
                         WindowTopBarLine.Visible = true
                 else
                         MainWindow.ClipsDescendants = true
@@ -962,9 +914,9 @@ function Library:MakeWindow(WindowConfig)
 
                         TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, WindowName.TextBounds.X + 140, 0, 50)}):Play()
                         wait(0.1)
-                        WindowStuff.Visible = false     
+                        TabSidePanel.Visible = false
                 end
-                Minimized = not Minimized   
+                Minimized = not Minimized
         end)
 
         AddConnection(MinimizeBtn.MouseButton1Down, function()
@@ -1175,11 +1127,11 @@ function Library:MakeWindow(WindowConfig)
 
                 MainWindow.Visible = true
                 IntroScreenGui:Destroy()
-        end 
+        end
 
         if WindowConfig.IntroEnabled then
                 LoadSequence()
-        end     
+        end
 
         local TabFunction = {}
         function TabFunction:MakeTab(TabConfig)
@@ -1187,30 +1139,59 @@ function Library:MakeWindow(WindowConfig)
                 TabConfig.Name = TabConfig.Name or "Tab"
                 TabConfig.Icon = TabConfig.Icon or ""
                 TabConfig.PremiumOnly = TabConfig.PremiumOnly or false
+                TabConfig.Section = TabConfig.Section or ""
+
+                if TabConfig.Section ~= "" and not SectionHeaders[TabConfig.Section] then
+                        SectionHeaders[TabConfig.Section] = true
+                        local SectionBarFrame = SetProps(MakeElement("TFrame"), {
+                                Size = UDim2.new(1, 0, 0, 26),
+                                Parent = TabHolder
+                        })
+                        local SectionBar = Instance.new("Frame")
+                        SectionBar.Size = UDim2.new(0, 3, 0, 13)
+                        SectionBar.Position = UDim2.new(0, 8, 0.5, 0)
+                        SectionBar.AnchorPoint = Vector2.new(0, 0.5)
+                        SectionBar.BackgroundColor3 = Color3.fromRGB(230, 180, 60)
+                        SectionBar.BorderSizePixel = 0
+                        local SectionBarCorner = Instance.new("UICorner")
+                        SectionBarCorner.CornerRadius = UDim.new(0, 100)
+                        SectionBarCorner.Parent = SectionBar
+                        SectionBar.Parent = SectionBarFrame
+                        local SectionLabel = Instance.new("TextLabel")
+                        SectionLabel.Size = UDim2.new(1, -20, 1, 0)
+                        SectionLabel.Position = UDim2.new(0, 18, 0, 0)
+                        SectionLabel.BackgroundTransparency = 1
+                        SectionLabel.Text = string.upper(TabConfig.Section)
+                        SectionLabel.TextColor3 = Color3.fromRGB(230, 180, 60)
+                        SectionLabel.Font = Enum.Font.GothamBold
+                        SectionLabel.TextSize = 11
+                        SectionLabel.TextXAlignment = Enum.TextXAlignment.Left
+                        SectionLabel.Parent = SectionBarFrame
+                end
 
                 local TabFrame = SetChildren(SetProps(MakeElement("Button"), {
-                        Size = UDim2.new(1, 0, 0, 30),
+                        Size = UDim2.new(1, 0, 0, 32),
                         Parent = TabHolder
                 }), {
                         AddThemeObject(SetProps(MakeElement("Image", TabConfig.Icon), {
                                 AnchorPoint = Vector2.new(0, 0.5),
                                 Size = UDim2.new(0, 18, 0, 18),
-                                Position = UDim2.new(0, 10, 0.5, 0),
-                                ImageTransparency = 0.4,
+                                Position = UDim2.new(0, 8, 0.5, 0),
+                                ImageTransparency = 0.5,
                                 Name = "Ico"
                         }), "Text"),
-                        AddThemeObject(SetProps(MakeElement("Label", TabConfig.Name, 14), {
-                                Size = UDim2.new(1, -35, 1, 0),
-                                Position = UDim2.new(0, 35, 0, 0),
+                        AddThemeObject(SetProps(MakeElement("Label", TabConfig.Name, 13), {
+                                Size = UDim2.new(1, -32, 1, 0),
+                                Position = UDim2.new(0, 32, 0, 0),
                                 Font = Library.Fonts[Library.SelectedFont] or Library.Font,
-                                TextTransparency = 0.4,
+                                TextTransparency = 0.5,
                                 Name = "Title"
                         }), "Text")
                 })
 
                 if GetIcon(TabConfig.Icon) ~= nil then
                         TabFrame.Ico.Image = GetIcon(TabConfig.Icon)
-                end     
+                end
 
                 local Container = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 5), {
                         Size = UDim2.new(1, -150, 1, -50),
@@ -1230,17 +1211,19 @@ function Library:MakeWindow(WindowConfig)
                 if FirstTab then
                         FirstTab = false
                         TabFrame.Ico.ImageTransparency = 0
+                        TabFrame.Ico.ImageColor3 = Color3.fromRGB(230, 180, 60)
                         TabFrame.Title.TextTransparency = 0
+                        TabFrame.Title.TextColor3 = Color3.fromRGB(230, 180, 60)
                         TabFrame.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
                         Container.Visible = true
-                end   
+                end
 
                 AddConnection(TabFrame.MouseButton1Click, function()
                         for _, Tab in next, TabHolder:GetChildren() do
                                 if Tab:IsA("TextButton") then
                                         Tab.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
-                                        TweenService:Create(Tab.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0.4, ImageColor3 = Color3.fromRGB(240, 240, 240)}):Play()
-                                        TweenService:Create(Tab.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0.4, TextColor3 = Color3.fromRGB(240, 240, 240)}):Play()
+                                        TweenService:Create(Tab.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0.5, ImageColor3 = Color3.fromRGB(200, 200, 200)}):Play()
+                                        TweenService:Create(Tab.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0.5, TextColor3 = Color3.fromRGB(200, 200, 200)}):Play()
                                 end
                         end
                         for _, ItemContainer in next, MainWindow:GetChildren() do
@@ -1248,8 +1231,8 @@ function Library:MakeWindow(WindowConfig)
                                         ItemContainer.Visible = false
                                 end
                         end
-                        TweenService:Create(TabFrame.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0, ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-                        TweenService:Create(TabFrame.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0, TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+                        TweenService:Create(TabFrame.Ico, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0, ImageColor3 = Color3.fromRGB(230, 180, 60)}):Play()
+                        TweenService:Create(TabFrame.Title, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0, TextColor3 = Color3.fromRGB(230, 180, 60)}):Play()
                         TabFrame.Title.Font = Library.Fonts[Library.SelectedFont] or Library.Font
                         Container.Visible = true
                 end)
@@ -1325,7 +1308,7 @@ function Library:MakeWindow(WindowConfig)
                                         ParagraphFrame.Content.Text = ToChange
                                 end
                                 return ParagraphFunction
-                        end   
+                        end
 
                         function ElementFunction:AddButton(ButtonConfig)
                                 ButtonConfig = ButtonConfig or {}
@@ -1393,10 +1376,10 @@ function Library:MakeWindow(WindowConfig)
 
                                 function Button:Set(ButtonText)
                                         ButtonFrame.Content.Text = ButtonText
-                                end     
+                                end
 
                                 return Button
-                        end   
+                        end
 
                         function ElementFunction:AddToggle(ToggleConfig)
                                 ToggleConfig = ToggleConfig or {}
@@ -1504,7 +1487,7 @@ function Library:MakeWindow(WindowConfig)
                                                 })
                                         end
                                         ToggleConfig.Callback(Toggle.Value)
-                                end   
+                                end
 
                                 Toggle:Set(Toggle.Value)
 
@@ -1534,9 +1517,9 @@ function Library:MakeWindow(WindowConfig)
 
                                 if ToggleConfig.Flag then
                                         Library.Flags[ToggleConfig.Flag] = Toggle
-                                end     
+                                end
                                 return Toggle
-                        end  
+                        end
 
                         function ElementFunction:AddSlider(SliderConfig)
                                 SliderConfig = SliderConfig or {}
@@ -1618,26 +1601,26 @@ function Library:MakeWindow(WindowConfig)
                                 }).Parent = SliderFrame
 
                                 SliderBar.InputBegan:Connect(function(Input)
-                                        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then 
+                                        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                                                 local SoundService = game:GetService("SoundService")
                                                 local sound = Instance.new("Sound", SoundService)
                                                 sound.SoundId = "rbxassetid://6895079853"
                                                 sound.Volume = 1
                                                 sound:Play()
                                                 game:GetService("Debris"):AddItem(sound, 3)
-                                                Dragging = true 
-                                        end 
+                                                Dragging = true
+                                        end
                                 end)
-                                SliderBar.InputEnded:Connect(function(Input) 
-                                        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then 
-                                                Dragging = false 
-                                        end 
+                                SliderBar.InputEnded:Connect(function(Input)
+                                        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+                                                Dragging = false
+                                        end
                                 end)
 
                                 UserInputService.InputChanged:Connect(function(Input)
-                                        if Dragging then 
+                                        if Dragging then
                                                 local SizeScale = math.clamp((Mouse.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1)
-                                                Slider:Set(SliderConfig.Min + ((SliderConfig.Max - SliderConfig.Min) * SizeScale)) 
+                                                Slider:Set(SliderConfig.Min + ((SliderConfig.Max - SliderConfig.Min) * SizeScale))
                                                 SaveCfg(game.GameId)
                                         end
                                 end)
@@ -1648,14 +1631,14 @@ function Library:MakeWindow(WindowConfig)
                                         SliderBar.Value.Text = tostring(self.Value) .. " " .. SliderConfig.ValueName
                                         SliderDrag.Value.Text = tostring(self.Value) .. " " .. SliderConfig.ValueName
                                         SliderConfig.Callback(self.Value)
-                                end    
+                                end
 
                                 Slider:Set(Slider.Value)
-                                if SliderConfig.Flag then                               
+                                if SliderConfig.Flag then
                                         Library.Flags[SliderConfig.Flag] = Slider
                                 end
                                 return Slider
-                        end  
+                        end
 
                         function ElementFunction:AddDropdown(DropdownConfig)
                                 DropdownConfig = DropdownConfig or {}
@@ -1721,7 +1704,7 @@ function Library:MakeWindow(WindowConfig)
                                                         Name = "Line",
                                                         Visible = false,
                                                         BackgroundTransparency = 0.4
-                                                }), "Stroke"), 
+                                                }), "Stroke"),
                                                 Click
                                         }), {
                                                 Size = UDim2.new(1, 0, 0, 38),
@@ -1742,7 +1725,7 @@ function Library:MakeWindow(WindowConfig)
 
                                 AddConnection(DropdownList:GetPropertyChangedSignal("AbsoluteContentSize"), function()
                                         DropdownContainer.CanvasSize = UDim2.new(0, 0, 0, DropdownList.AbsoluteContentSize.Y)
-                                end)  
+                                end)
 
                                 local function AddOptions(Options)
                                         for _, Option in pairs(Options) do
@@ -1782,19 +1765,19 @@ function Library:MakeWindow(WindowConfig)
 
                                                 Dropdown.Buttons[Option] = OptionBtn
                                         end
-                                end     
+                                end
 
                                 function Dropdown:Refresh(Options, Delete)
                                         if Delete then
                                                 for _,v in pairs(Dropdown.Buttons) do
                                                         v:Destroy()
-                                                end   
+                                                end
                                                 table.clear(Dropdown.Options)
                                                 table.clear(Dropdown.Buttons)
                                         end
                                         Dropdown.Options = Options
                                         AddOptions(Dropdown.Options)
-                                end  
+                                end
 
                                 function Dropdown:Set(Value)
                                         if not table.find(Dropdown.Options, Value) then
@@ -1803,7 +1786,7 @@ function Library:MakeWindow(WindowConfig)
                                                 for _, v in pairs(Dropdown.Buttons) do
                                                         TweenService:Create(v,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundTransparency = 0.8}):Play()
                                                         TweenService:Create(v.Title,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0.4}):Play()
-                                                end     
+                                                end
                                                 return
                                         end
 
@@ -1813,7 +1796,7 @@ function Library:MakeWindow(WindowConfig)
                                         for _, v in pairs(Dropdown.Buttons) do
                                                 TweenService:Create(v,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundTransparency = 0.8}):Play()
                                                 TweenService:Create(v.Title,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0.4}):Play()
-                                        end     
+                                        end
                                         TweenService:Create(Dropdown.Buttons[Value],TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundTransparency = 0.3}):Play()
                                         TweenService:Create(Dropdown.Buttons[Value].Title,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0}):Play()
                                         return DropdownConfig.Callback(Dropdown.Value)
@@ -1841,7 +1824,7 @@ function Library:MakeWindow(WindowConfig)
 
                                 Dropdown:Refresh(Dropdown.Options, false)
                                 Dropdown:Set(Dropdown.Value)
-                                if DropdownConfig.Flag then                             
+                                if DropdownConfig.Flag then
                                         Library.Flags[DropdownConfig.Flag] = Dropdown
                                 end
                                 return Dropdown
@@ -2227,11 +2210,11 @@ function Library:MakeWindow(WindowConfig)
                                 end
 
                                 Bind:Set(BindConfig.Default)
-                                if BindConfig.Flag then                         
+                                if BindConfig.Flag then
                                         Library.Flags[BindConfig.Flag] = Bind
                                 end
                                 return Bind
-                        end  
+                        end
 
                         function ElementFunction:AddTextbox(TextboxConfig)
                                 TextboxConfig = TextboxConfig or {}
@@ -2290,7 +2273,7 @@ function Library:MakeWindow(WindowConfig)
                                         TextboxConfig.Callback(TextboxActual.Text)
                                         if TextboxConfig.TextDisappear then
                                                 TextboxActual.Text = ""
-                                        end     
+                                        end
                                 end)
 
                                 TextboxActual.Text = TextboxConfig.Default
@@ -2317,7 +2300,7 @@ function Library:MakeWindow(WindowConfig)
                                         sound:Play()
                                         game:GetService("Debris"):AddItem(sound, 3)
                                 end)
-                        end 
+                        end
 
                         function ElementFunction:AddColorpicker(ColorpickerConfig)
                                 ColorpickerConfig = ColorpickerConfig or {}
@@ -2416,7 +2399,7 @@ function Library:MakeWindow(WindowConfig)
                                                         Name = "Line",
                                                         Visible = false,
                                                         BackgroundTransparency = 0.4
-                                                }), "Stroke"), 
+                                                }), "Stroke"),
                                         }), {
                                                 Size = UDim2.new(1, 0, 0, 38),
                                                 ClipsDescendants = true,
@@ -2523,7 +2506,7 @@ function Library:MakeWindow(WindowConfig)
                                 end
 
                                 Colorpicker:Set(Colorpicker.Value)
-                                if ColorpickerConfig.Flag then                          
+                                if ColorpickerConfig.Flag then
                                         Library.Flags[ColorpickerConfig.Flag] = Colorpicker
                                 end
                                 return Colorpicker
@@ -3009,8 +2992,8 @@ function Library:MakeWindow(WindowConfig)
                                 }
                         end
 
-                        return ElementFunction  
-                end     
+                        return ElementFunction
+                end
 
                 local ElementFunction = {}
 
@@ -3071,19 +3054,19 @@ function Library:MakeWindow(WindowConfig)
 
                         local SectionFunction = {}
                         for i, v in next, GetElements(SectionFrame.Holder) do
-                                SectionFunction[i] = v 
+                                SectionFunction[i] = v
                         end
                         return SectionFunction
                 end
 
                 for i, v in next, GetElements(Container) do
-                        ElementFunction[i] = v 
+                        ElementFunction[i] = v
                 end
 
                 if TabConfig.PremiumOnly then
                         for i, v in next, ElementFunction do
                                 ElementFunction[i] = function() end
-                        end   
+                        end
                         Container:FindFirstChild("UIListLayout"):Destroy()
                         Container:FindFirstChild("UIPadding"):Destroy()
                         SetChildren(SetProps(MakeElement("TFrame"), {
@@ -3117,8 +3100,8 @@ function Library:MakeWindow(WindowConfig)
                                 }), "Text")
                         })
                 end
-                return ElementFunction  
-        end  
+                return ElementFunction
+        end
 
         return TabFunction
 end
