@@ -1091,26 +1091,31 @@ function Library:MakeWindow(WindowConfig)
         MakeDraggable(DragPoint, MainWindow)
 
         -- ── Xeioa Tags ────────────────────────────────────────────────────
+        local TagsRow = nil
         if WindowConfig.Tags and #WindowConfig.Tags > 0 then
-                -- Narrow the title so tags never overlap it
-                WindowName.Size = UDim2.new(0.52, 0, 2, 0)
-                local TagsRow = Create("Frame", {
+                -- Fix title to left portion; tags will be centered in the bar
+                WindowName.Size = UDim2.new(0, 180, 2, 0)
+                TagsRow = Create("Frame", {
                         Parent = MainWindow.TopBar,
                         Size = UDim2.new(0, 0, 0, 18),
-                        Position = UDim2.new(1, -100, 0.5, 0),
-                        AnchorPoint = Vector2.new(1, 0.5),
-                        AutomaticSize = Enum.AutomaticSize.X,
+                        Position = UDim2.new(0.5, 0, 0.5, 0),
+                        AnchorPoint = Vector2.new(0.5, 0.5),
                         BackgroundTransparency = 1,
+                        ClipsDescendants = false,
                         Name = "XeioaTagsRow",
                         ZIndex = 5
                 })
-                Create("UIListLayout", {
+                local _tagsLayout = Create("UIListLayout", {
                         FillDirection = Enum.FillDirection.Horizontal,
                         Padding = UDim.new(0, 4),
                         VerticalAlignment = Enum.VerticalAlignment.Center,
+                        HorizontalAlignment = Enum.HorizontalAlignment.Center,
                         SortOrder = Enum.SortOrder.LayoutOrder,
                         Parent = TagsRow
                 })
+                _tagsLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                        TagsRow.Size = UDim2.new(0, _tagsLayout.AbsoluteContentSize.X, 0, 18)
+                end)
                 local _defTagCol = {
                         FPS     = Color3.fromRGB(80, 220, 100),
                         Ping    = Color3.fromRGB(80, 180, 255),
@@ -1274,13 +1279,6 @@ function Library:MakeWindow(WindowConfig)
                                 end
                         end
                 end
-                task.defer(function()
-                        local tagsW = TagsRow.AbsoluteSize.X
-                        local btnRight = 100
-                        local maxTitleX = MainWindow.TopBar.AbsoluteSize.X - btnRight - tagsW - 12
-                        if maxTitleX < 60 then maxTitleX = 60 end
-                        WindowName.Size = UDim2.new(0, maxTitleX, 2, 0)
-                end)
         end
         -- ── End Tags ──────────────────────────────────────────────────────
 
