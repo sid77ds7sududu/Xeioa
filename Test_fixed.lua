@@ -1203,22 +1203,14 @@ function Library:MakeWindow(WindowConfig)
                                 local _ghUrl = td.Text or ""
                                 Lbl.Visible = false
                                 Dot.Visible = false
-                                Create("ImageLabel", {
-                                        Size = UDim2.new(0, 10, 0, 10),
+                                local _ghBtn = Create("ImageButton", {
+                                        Size = UDim2.new(0, 14, 0, 14),
                                         BackgroundTransparency = 1,
                                         Image = "rbxassetid://125233082111586",
-                                        ImageColor3 = Color3.fromRGB(220, 220, 220),
+                                        ImageColor3 = Color3.fromRGB(230, 230, 230),
                                         ScaleType = Enum.ScaleType.Fit,
                                         LayoutOrder = 0,
                                         Parent = Dot.Parent
-                                })
-                                local _ghBtn = Create("TextButton", {
-                                        Size = UDim2.new(1, 0, 1, 0),
-                                        Position = UDim2.new(0, 0, 0, 0),
-                                        BackgroundTransparency = 1,
-                                        Text = "",
-                                        ZIndex = 10,
-                                        Parent = Lbl.Parent
                                 })
                                 _ghBtn.MouseButton1Up:Connect(function()
                                         if _ghUrl ~= "" and setclipboard then
@@ -1235,22 +1227,14 @@ function Library:MakeWindow(WindowConfig)
                                 local _dcUrl = td.Text or ""
                                 Lbl.Visible = false
                                 Dot.Visible = false
-                                Create("ImageLabel", {
-                                        Size = UDim2.new(0, 10, 0, 10),
+                                local _dcBtn = Create("ImageButton", {
+                                        Size = UDim2.new(0, 14, 0, 14),
                                         BackgroundTransparency = 1,
                                         Image = "rbxassetid://18505728201",
-                                        ImageColor3 = Color3.fromRGB(220, 220, 220),
+                                        ImageColor3 = Color3.fromRGB(114, 137, 218),
                                         ScaleType = Enum.ScaleType.Fit,
                                         LayoutOrder = 0,
                                         Parent = Dot.Parent
-                                })
-                                local _dcBtn = Create("TextButton", {
-                                        Size = UDim2.new(1, 0, 1, 0),
-                                        Position = UDim2.new(0, 0, 0, 0),
-                                        BackgroundTransparency = 1,
-                                        Text = "",
-                                        ZIndex = 10,
-                                        Parent = Lbl.Parent
                                 })
                                 _dcBtn.MouseButton1Up:Connect(function()
                                         if _dcUrl ~= "" and setclipboard then
