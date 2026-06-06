@@ -1194,9 +1194,69 @@ function Library:MakeWindow(WindowConfig)
                                         end
                                 end)
                         elseif td.Type == "GitHub" then
-                                Lbl.Text = td.Text or "GitHub"
+                                local _ghUrl = td.Text or ""
+                                Lbl.Text = "GitHub"
+                                Dot.Visible = false
+                                Create("ImageLabel", {
+                                        Size = UDim2.new(0, 11, 0, 11),
+                                        BackgroundTransparency = 1,
+                                        Image = "rbxassetid://18505728201",
+                                        ImageColor3 = Color3.fromRGB(220, 220, 220),
+                                        ScaleType = Enum.ScaleType.Fit,
+                                        LayoutOrder = 0,
+                                        Parent = Dot.Parent
+                                })
+                                local _ghBtn = Create("TextButton", {
+                                        Size = UDim2.new(1, 0, 1, 0),
+                                        Position = UDim2.new(0, 0, 0, 0),
+                                        BackgroundTransparency = 1,
+                                        Text = "",
+                                        ZIndex = 10,
+                                        Parent = Lbl.Parent
+                                })
+                                _ghBtn.MouseButton1Up:Connect(function()
+                                        if _ghUrl ~= "" and setclipboard then
+                                                setclipboard(_ghUrl)
+                                        end
+                                        Library:MakeNotification({
+                                                Name = "GitHub",
+                                                Content = _ghUrl ~= "" and ("Copied: " .. _ghUrl) or "No link set.",
+                                                Image = "rbxassetid://18505728201",
+                                                Time = 4
+                                        })
+                                end)
                         elseif td.Type == "Discord" then
-                                Lbl.Text = td.Text or "Discord"
+                                local _dcUrl = td.Text or ""
+                                Lbl.Text = "Discord"
+                                Dot.Visible = false
+                                Create("ImageLabel", {
+                                        Size = UDim2.new(0, 11, 0, 11),
+                                        BackgroundTransparency = 1,
+                                        Image = "rbxassetid://125233082111586",
+                                        ImageColor3 = Color3.fromRGB(220, 220, 220),
+                                        ScaleType = Enum.ScaleType.Fit,
+                                        LayoutOrder = 0,
+                                        Parent = Dot.Parent
+                                })
+                                local _dcBtn = Create("TextButton", {
+                                        Size = UDim2.new(1, 0, 1, 0),
+                                        Position = UDim2.new(0, 0, 0, 0),
+                                        BackgroundTransparency = 1,
+                                        Text = "",
+                                        ZIndex = 10,
+                                        Parent = Lbl.Parent
+                                })
+                                _dcBtn.MouseButton1Up:Connect(function()
+                                        if _dcUrl ~= "" and setclipboard then
+                                                setclipboard(_dcUrl)
+                                        end
+                                        Library:MakeNotification({
+                                                Name = "Discord",
+                                                Content = _dcUrl ~= "" and ("Copied: " .. _dcUrl) or "No link set.",
+                                                Image = "rbxassetid://125233082111586",
+                                                Time = 4
+                                        })
+                                end)
                         elseif td.Type == "Custom" then
                                 Lbl.Text = td.Text or "Tag"
                                 if td.UpdateFn then
@@ -1214,6 +1274,13 @@ function Library:MakeWindow(WindowConfig)
                                 end
                         end
                 end
+                task.defer(function()
+                        local tagsW = TagsRow.AbsoluteSize.X
+                        local btnRight = 100
+                        local maxTitleX = MainWindow.TopBar.AbsoluteSize.X - btnRight - tagsW - 12
+                        if maxTitleX < 60 then maxTitleX = 60 end
+                        WindowName.Size = UDim2.new(0, maxTitleX, 2, 0)
+                end)
         end
         -- ── End Tags ──────────────────────────────────────────────────────
 
@@ -1290,7 +1357,8 @@ function Library:MakeWindow(WindowConfig)
                         WindowTopBarLine.Visible = false
                         MinimizeBtn.Ico.Image = "rbxassetid://7072720870"
 
-                        TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, WindowName.TextBounds.X + 140, 0, 50)}):Play()
+                        local _tagsW = (TagsRow and TagsRow.AbsoluteSize.X > 0) and (TagsRow.AbsoluteSize.X + 10) or 0
+                        TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, WindowName.TextBounds.X + 140 + _tagsW, 0, 50)}):Play()
                         wait(0.1)
                         TabSidePanel.Visible = false
                 end
