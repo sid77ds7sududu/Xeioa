@@ -1093,67 +1093,57 @@ function Library:MakeWindow(WindowConfig)
         -- ── Xeioa Tags ────────────────────────────────────────────────────
         local TagsRow = nil
         if WindowConfig.Tags and #WindowConfig.Tags > 0 then
-                -- Fix title to left portion; tags will be centered in the bar
-                WindowName.Size = UDim2.new(0, 180, 2, 0)
+                WindowName.Size = UDim2.new(0, 175, 2, 0)
                 TagsRow = Create("Frame", {
                         Parent = MainWindow.TopBar,
-                        Size = UDim2.new(0, 0, 0, 18),
+                        Size = UDim2.new(0, 0, 0, 20),
+                        AutomaticSize = Enum.AutomaticSize.X,
                         Position = UDim2.new(0.5, 0, 0.5, 0),
                         AnchorPoint = Vector2.new(0.5, 0.5),
                         BackgroundTransparency = 1,
-                        ClipsDescendants = false,
                         Name = "XeioaTagsRow",
                         ZIndex = 5
                 })
-                local _tagsLayout = Create("UIListLayout", {
+                Create("UIListLayout", {
                         FillDirection = Enum.FillDirection.Horizontal,
-                        Padding = UDim.new(0, 4),
+                        Padding = UDim.new(0, 5),
                         VerticalAlignment = Enum.VerticalAlignment.Center,
-                        HorizontalAlignment = Enum.HorizontalAlignment.Center,
                         SortOrder = Enum.SortOrder.LayoutOrder,
                         Parent = TagsRow
                 })
-                local function _updateTagsSize()
-                        local w = _tagsLayout.AbsoluteContentSize.X
-                        if w > 0 then
-                                TagsRow.Size = UDim2.new(0, w, 0, 18)
-                        end
-                end
-                _tagsLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(_updateTagsSize)
-                task.defer(_updateTagsSize)
                 local _defTagCol = {
                         FPS     = Color3.fromRGB(80, 220, 100),
                         Ping    = Color3.fromRGB(80, 180, 255),
-                        GitHub  = Color3.fromRGB(190, 190, 190),
+                        GitHub  = Color3.fromRGB(180, 180, 180),
                         Discord = Color3.fromRGB(114, 137, 218),
                         Custom  = Library.Themes[Library.SelectedTheme].Accent or Color3.fromRGB(230, 180, 60)
                 }
                 local function _mkPill(td, order)
-                        local col = td.Color or _defTagCol[td.Type] or Color3.fromRGB(150,150,150)
+                        local col = td.Color or _defTagCol[td.Type] or Color3.fromRGB(150, 150, 150)
                         local Pill = Create("Frame", {
                                 Size = UDim2.new(0, 0, 1, 0),
                                 AutomaticSize = Enum.AutomaticSize.X,
                                 BackgroundColor3 = col,
-                                BackgroundTransparency = 0.78,
+                                BackgroundTransparency = 0.82,
                                 BorderSizePixel = 0,
                                 LayoutOrder = order,
                                 Parent = TagsRow
                         })
                         Create("UICorner", {CornerRadius = UDim.new(1, 0)}).Parent = Pill
-                        Create("UIStroke", {Color = col, Thickness = 1, Transparency = 0.45}).Parent = Pill
+                        Create("UIStroke", {Color = col, Thickness = 1, Transparency = 0.4}).Parent = Pill
                         Create("UIPadding", {
-                                PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 5),
-                                PaddingTop = UDim.new(0, 1),  PaddingBottom = UDim.new(0, 1)
+                                PaddingLeft  = UDim.new(0, 6), PaddingRight  = UDim.new(0, 6),
+                                PaddingTop   = UDim.new(0, 0), PaddingBottom = UDim.new(0, 0)
                         }).Parent = Pill
                         Create("UIListLayout", {
                                 FillDirection = Enum.FillDirection.Horizontal,
-                                Padding = UDim.new(0, 3),
+                                Padding = UDim.new(0, 4),
                                 VerticalAlignment = Enum.VerticalAlignment.Center,
                                 SortOrder = Enum.SortOrder.LayoutOrder,
                                 Parent = Pill
                         })
                         local Dot = Create("Frame", {
-                                Size = UDim2.new(0, 4, 0, 4),
+                                Size = UDim2.new(0, 5, 0, 5),
                                 BackgroundColor3 = col,
                                 BorderSizePixel = 0,
                                 LayoutOrder = 1,
@@ -1164,8 +1154,8 @@ function Library:MakeWindow(WindowConfig)
                                 Size = UDim2.new(0, 0, 1, 0),
                                 AutomaticSize = Enum.AutomaticSize.X,
                                 BackgroundTransparency = 1,
-                                TextColor3 = Color3.fromRGB(230, 230, 230),
-                                TextSize = 9,
+                                TextColor3 = Color3.fromRGB(235, 235, 235),
+                                TextSize = 11,
                                 Font = Enum.Font.GothamBold,
                                 Text = td.Text or td.Type or "Tag",
                                 LayoutOrder = 2,
