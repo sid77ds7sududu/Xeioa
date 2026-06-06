@@ -1201,7 +1201,7 @@ function Library:MakeWindow(WindowConfig)
                                 end)
                         elseif td.Type == "GitHub" then
                                 local _ghUrl = td.Text or ""
-                                Lbl.Text = "GitHub"
+                                Lbl.Visible = false
                                 Dot.Visible = false
                                 Create("ImageLabel", {
                                         Size = UDim2.new(0, 10, 0, 10),
@@ -1233,7 +1233,7 @@ function Library:MakeWindow(WindowConfig)
                                 end)
                         elseif td.Type == "Discord" then
                                 local _dcUrl = td.Text or ""
-                                Lbl.Text = "Discord"
+                                Lbl.Visible = false
                                 Dot.Visible = false
                                 Create("ImageLabel", {
                                         Size = UDim2.new(0, 10, 0, 10),
