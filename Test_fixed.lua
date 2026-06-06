@@ -1113,9 +1113,14 @@ function Library:MakeWindow(WindowConfig)
                         SortOrder = Enum.SortOrder.LayoutOrder,
                         Parent = TagsRow
                 })
-                _tagsLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-                        TagsRow.Size = UDim2.new(0, _tagsLayout.AbsoluteContentSize.X, 0, 18)
-                end)
+                local function _updateTagsSize()
+                        local w = _tagsLayout.AbsoluteContentSize.X
+                        if w > 0 then
+                                TagsRow.Size = UDim2.new(0, w, 0, 18)
+                        end
+                end
+                _tagsLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(_updateTagsSize)
+                task.defer(_updateTagsSize)
                 local _defTagCol = {
                         FPS     = Color3.fromRGB(80, 220, 100),
                         Ping    = Color3.fromRGB(80, 180, 255),
@@ -1137,18 +1142,18 @@ function Library:MakeWindow(WindowConfig)
                         Create("UICorner", {CornerRadius = UDim.new(1, 0)}).Parent = Pill
                         Create("UIStroke", {Color = col, Thickness = 1, Transparency = 0.45}).Parent = Pill
                         Create("UIPadding", {
-                                PaddingLeft = UDim.new(0, 7), PaddingRight = UDim.new(0, 7),
+                                PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 5),
                                 PaddingTop = UDim.new(0, 1),  PaddingBottom = UDim.new(0, 1)
                         }).Parent = Pill
                         Create("UIListLayout", {
                                 FillDirection = Enum.FillDirection.Horizontal,
-                                Padding = UDim.new(0, 4),
+                                Padding = UDim.new(0, 3),
                                 VerticalAlignment = Enum.VerticalAlignment.Center,
                                 SortOrder = Enum.SortOrder.LayoutOrder,
                                 Parent = Pill
                         })
                         local Dot = Create("Frame", {
-                                Size = UDim2.new(0, 5, 0, 5),
+                                Size = UDim2.new(0, 4, 0, 4),
                                 BackgroundColor3 = col,
                                 BorderSizePixel = 0,
                                 LayoutOrder = 1,
@@ -1160,7 +1165,7 @@ function Library:MakeWindow(WindowConfig)
                                 AutomaticSize = Enum.AutomaticSize.X,
                                 BackgroundTransparency = 1,
                                 TextColor3 = Color3.fromRGB(230, 230, 230),
-                                TextSize = 10,
+                                TextSize = 9,
                                 Font = Enum.Font.GothamBold,
                                 Text = td.Text or td.Type or "Tag",
                                 LayoutOrder = 2,
@@ -1203,9 +1208,9 @@ function Library:MakeWindow(WindowConfig)
                                 Lbl.Text = "GitHub"
                                 Dot.Visible = false
                                 Create("ImageLabel", {
-                                        Size = UDim2.new(0, 11, 0, 11),
+                                        Size = UDim2.new(0, 10, 0, 10),
                                         BackgroundTransparency = 1,
-                                        Image = "rbxassetid://18505728201",
+                                        Image = "rbxassetid://125233082111586",
                                         ImageColor3 = Color3.fromRGB(220, 220, 220),
                                         ScaleType = Enum.ScaleType.Fit,
                                         LayoutOrder = 0,
@@ -1226,7 +1231,7 @@ function Library:MakeWindow(WindowConfig)
                                         Library:MakeNotification({
                                                 Name = "GitHub",
                                                 Content = _ghUrl ~= "" and ("Copied: " .. _ghUrl) or "No link set.",
-                                                Image = "rbxassetid://18505728201",
+                                                Image = "rbxassetid://125233082111586",
                                                 Time = 4
                                         })
                                 end)
@@ -1235,9 +1240,9 @@ function Library:MakeWindow(WindowConfig)
                                 Lbl.Text = "Discord"
                                 Dot.Visible = false
                                 Create("ImageLabel", {
-                                        Size = UDim2.new(0, 11, 0, 11),
+                                        Size = UDim2.new(0, 10, 0, 10),
                                         BackgroundTransparency = 1,
-                                        Image = "rbxassetid://125233082111586",
+                                        Image = "rbxassetid://18505728201",
                                         ImageColor3 = Color3.fromRGB(220, 220, 220),
                                         ScaleType = Enum.ScaleType.Fit,
                                         LayoutOrder = 0,
@@ -1258,7 +1263,7 @@ function Library:MakeWindow(WindowConfig)
                                         Library:MakeNotification({
                                                 Name = "Discord",
                                                 Content = _dcUrl ~= "" and ("Copied: " .. _dcUrl) or "No link set.",
-                                                Image = "rbxassetid://125233082111586",
+                                                Image = "rbxassetid://18505728201",
                                                 Time = 4
                                         })
                                 end)
