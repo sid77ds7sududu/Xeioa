@@ -1023,8 +1023,6 @@ function Library:MakeWindow(WindowConfig)
                 Size = UDim2.new(1, 0, 0, 50)
         })
 
-
-
         local WindowName = AddThemeObject(SetProps(MakeElement("Label", WindowConfig.Name, 14), {
                 Size = UDim2.new(1, -30, 2, 0),
                 Position = UDim2.new(0, 25, 0, -24),
@@ -1090,60 +1088,68 @@ function Library:MakeWindow(WindowConfig)
 
         MakeDraggable(DragPoint, MainWindow)
 
-        -- ── Xeioa Tags ────────────────────────────────────────────────────
         local TagsRow = nil
         if WindowConfig.Tags and #WindowConfig.Tags > 0 then
-                WindowName.Size = UDim2.new(0, 175, 2, 0)
+                WindowName.Size = UDim2.new(0, 180, 2, 0)
                 TagsRow = Create("Frame", {
                         Parent = MainWindow.TopBar,
-                        Size = UDim2.new(0, 0, 0, 20),
-                        AutomaticSize = Enum.AutomaticSize.X,
+                        Size = UDim2.new(0, 0, 0, 18),
                         Position = UDim2.new(0.5, 0, 0.5, 0),
                         AnchorPoint = Vector2.new(0.5, 0.5),
                         BackgroundTransparency = 1,
+                        ClipsDescendants = false,
                         Name = "XeioaTagsRow",
                         ZIndex = 5
                 })
-                Create("UIListLayout", {
+                local _tagsLayout = Create("UIListLayout", {
                         FillDirection = Enum.FillDirection.Horizontal,
-                        Padding = UDim.new(0, 5),
+                        Padding = UDim.new(0, 4),
                         VerticalAlignment = Enum.VerticalAlignment.Center,
+                        HorizontalAlignment = Enum.HorizontalAlignment.Center,
                         SortOrder = Enum.SortOrder.LayoutOrder,
                         Parent = TagsRow
                 })
+                local function _updateTagsSize()
+                        local w = _tagsLayout.AbsoluteContentSize.X
+                        if w > 0 then
+                                TagsRow.Size = UDim2.new(0, w, 0, 18)
+                        end
+                end
+                _tagsLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(_updateTagsSize)
+                task.defer(_updateTagsSize)
                 local _defTagCol = {
                         FPS     = Color3.fromRGB(80, 220, 100),
                         Ping    = Color3.fromRGB(80, 180, 255),
-                        GitHub  = Color3.fromRGB(180, 180, 180),
+                        GitHub  = Color3.fromRGB(190, 190, 190),
                         Discord = Color3.fromRGB(114, 137, 218),
                         Custom  = Library.Themes[Library.SelectedTheme].Accent or Color3.fromRGB(230, 180, 60)
                 }
                 local function _mkPill(td, order)
-                        local col = td.Color or _defTagCol[td.Type] or Color3.fromRGB(150, 150, 150)
+                        local col = td.Color or _defTagCol[td.Type] or Color3.fromRGB(150,150,150)
                         local Pill = Create("Frame", {
                                 Size = UDim2.new(0, 0, 1, 0),
                                 AutomaticSize = Enum.AutomaticSize.X,
                                 BackgroundColor3 = col,
-                                BackgroundTransparency = 0.82,
+                                BackgroundTransparency = 0.78,
                                 BorderSizePixel = 0,
                                 LayoutOrder = order,
                                 Parent = TagsRow
                         })
                         Create("UICorner", {CornerRadius = UDim.new(1, 0)}).Parent = Pill
-                        Create("UIStroke", {Color = col, Thickness = 1, Transparency = 0.4}).Parent = Pill
+                        Create("UIStroke", {Color = col, Thickness = 1, Transparency = 0.45}).Parent = Pill
                         Create("UIPadding", {
-                                PaddingLeft  = UDim.new(0, 6), PaddingRight  = UDim.new(0, 6),
-                                PaddingTop   = UDim.new(0, 0), PaddingBottom = UDim.new(0, 0)
+                                PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 5),
+                                PaddingTop = UDim.new(0, 1),  PaddingBottom = UDim.new(0, 1)
                         }).Parent = Pill
                         Create("UIListLayout", {
                                 FillDirection = Enum.FillDirection.Horizontal,
-                                Padding = UDim.new(0, 4),
+                                Padding = UDim.new(0, 3),
                                 VerticalAlignment = Enum.VerticalAlignment.Center,
                                 SortOrder = Enum.SortOrder.LayoutOrder,
                                 Parent = Pill
                         })
                         local Dot = Create("Frame", {
-                                Size = UDim2.new(0, 5, 0, 5),
+                                Size = UDim2.new(0, 4, 0, 4),
                                 BackgroundColor3 = col,
                                 BorderSizePixel = 0,
                                 LayoutOrder = 1,
@@ -1154,8 +1160,8 @@ function Library:MakeWindow(WindowConfig)
                                 Size = UDim2.new(0, 0, 1, 0),
                                 AutomaticSize = Enum.AutomaticSize.X,
                                 BackgroundTransparency = 1,
-                                TextColor3 = Color3.fromRGB(235, 235, 235),
-                                TextSize = 11,
+                                TextColor3 = Color3.fromRGB(230, 230, 230),
+                                TextSize = 9,
                                 Font = Enum.Font.GothamBold,
                                 Text = td.Text or td.Type or "Tag",
                                 LayoutOrder = 2,
@@ -1195,31 +1201,25 @@ function Library:MakeWindow(WindowConfig)
                                 end)
                         elseif td.Type == "GitHub" then
                                 local _ghUrl = td.Text or ""
-                                Lbl.Visible = false
+                                Lbl.Text = "GitHub"
                                 Dot.Visible = false
-                                local _ghPill = Dot.Parent
                                 Create("ImageLabel", {
-                                        Size = UDim2.new(0, 14, 0, 14),
+                                        Size = UDim2.new(0, 10, 0, 10),
                                         BackgroundTransparency = 1,
                                         Image = "rbxassetid://125233082111586",
-                                        ImageColor3 = Color3.fromRGB(225, 225, 225),
+                                        ImageColor3 = Color3.fromRGB(220, 220, 220),
                                         ScaleType = Enum.ScaleType.Fit,
-                                        LayoutOrder = 1,
-                                        ZIndex = 5,
-                                        Parent = _ghPill
+                                        LayoutOrder = 0,
+                                        Parent = Dot.Parent
                                 })
                                 local _ghBtn = Create("TextButton", {
-                                        Size = UDim2.new(0, 1, 0, 1),
+                                        Size = UDim2.new(1, 0, 1, 0),
+                                        Position = UDim2.new(0, 0, 0, 0),
                                         BackgroundTransparency = 1,
                                         Text = "",
-                                        ZIndex = 20,
-                                        Parent = MainWindow.TopBar
+                                        ZIndex = 10,
+                                        Parent = Lbl.Parent
                                 })
-                                task.defer(function()
-                                        local tb = MainWindow.TopBar
-                                        _ghBtn.Position = UDim2.new(0, _ghPill.AbsolutePosition.X - tb.AbsolutePosition.X, 0, _ghPill.AbsolutePosition.Y - tb.AbsolutePosition.Y)
-                                        _ghBtn.Size = UDim2.new(0, _ghPill.AbsoluteSize.X, 0, _ghPill.AbsoluteSize.Y)
-                                end)
                                 _ghBtn.MouseButton1Up:Connect(function()
                                         if _ghUrl ~= "" and setclipboard then
                                                 setclipboard(_ghUrl)
@@ -1233,31 +1233,25 @@ function Library:MakeWindow(WindowConfig)
                                 end)
                         elseif td.Type == "Discord" then
                                 local _dcUrl = td.Text or ""
-                                Lbl.Visible = false
+                                Lbl.Text = "Discord"
                                 Dot.Visible = false
-                                local _dcPill = Dot.Parent
                                 Create("ImageLabel", {
-                                        Size = UDim2.new(0, 14, 0, 14),
+                                        Size = UDim2.new(0, 10, 0, 10),
                                         BackgroundTransparency = 1,
                                         Image = "rbxassetid://18505728201",
-                                        ImageColor3 = Color3.fromRGB(225, 225, 225),
+                                        ImageColor3 = Color3.fromRGB(220, 220, 220),
                                         ScaleType = Enum.ScaleType.Fit,
-                                        LayoutOrder = 1,
-                                        ZIndex = 5,
-                                        Parent = _dcPill
+                                        LayoutOrder = 0,
+                                        Parent = Dot.Parent
                                 })
                                 local _dcBtn = Create("TextButton", {
-                                        Size = UDim2.new(0, 1, 0, 1),
+                                        Size = UDim2.new(1, 0, 1, 0),
+                                        Position = UDim2.new(0, 0, 0, 0),
                                         BackgroundTransparency = 1,
                                         Text = "",
-                                        ZIndex = 20,
-                                        Parent = MainWindow.TopBar
+                                        ZIndex = 10,
+                                        Parent = Lbl.Parent
                                 })
-                                task.defer(function()
-                                        local tb = MainWindow.TopBar
-                                        _dcBtn.Position = UDim2.new(0, _dcPill.AbsolutePosition.X - tb.AbsolutePosition.X, 0, _dcPill.AbsolutePosition.Y - tb.AbsolutePosition.Y)
-                                        _dcBtn.Size = UDim2.new(0, _dcPill.AbsoluteSize.X, 0, _dcPill.AbsoluteSize.Y)
-                                end)
                                 _dcBtn.MouseButton1Up:Connect(function()
                                         if _dcUrl ~= "" and setclipboard then
                                                 setclipboard(_dcUrl)
@@ -1287,19 +1281,6 @@ function Library:MakeWindow(WindowConfig)
                         end
                 end
         end
-        -- ── End Tags ──────────────────────────────────────────────────────
-
-        -- ── Viewport-based UIScale ─────────────────────────────────────────
-        local _uiScale = Instance.new("UIScale")
-        _uiScale.Parent = MainWindow
-        local function _applyScale()
-                local vp = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1920, 1080)
-                local s = math.clamp(math.min(vp.X / 1366, vp.Y / 768), 0.55, 1.25)
-                _uiScale.Scale = s
-        end
-        _applyScale()
-        AddConnection(workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"), _applyScale)
-        -- ── End UIScale ────────────────────────────────────────────────────
 
         local MobileReopenButton = SetChildren(SetProps(MakeElement("Button"), {
                 Parent = Container,
@@ -3400,7 +3381,6 @@ function Library:MakeWindow(WindowConfig)
                                                 Name = "AccentStrip",
                                                 Parent = Btn
                                         })
-                                        
 
                                         local Check = Create("ImageLabel", {
                                                 Size = UDim2.new(0, 14, 0, 14),
