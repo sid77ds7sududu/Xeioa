@@ -1195,25 +1195,31 @@ function Library:MakeWindow(WindowConfig)
                                 end)
                         elseif td.Type == "GitHub" then
                                 local _ghUrl = td.Text or ""
-                                Lbl.Text = "GitHub"
+                                Lbl.Visible = false
                                 Dot.Visible = false
+                                local _ghPill = Dot.Parent
                                 Create("ImageLabel", {
-                                        Size = UDim2.new(0, 10, 0, 10),
+                                        Size = UDim2.new(0, 14, 0, 14),
                                         BackgroundTransparency = 1,
                                         Image = "rbxassetid://125233082111586",
-                                        ImageColor3 = Color3.fromRGB(220, 220, 220),
+                                        ImageColor3 = Color3.fromRGB(225, 225, 225),
                                         ScaleType = Enum.ScaleType.Fit,
-                                        LayoutOrder = 0,
-                                        Parent = Dot.Parent
+                                        LayoutOrder = 1,
+                                        ZIndex = 5,
+                                        Parent = _ghPill
                                 })
                                 local _ghBtn = Create("TextButton", {
-                                        Size = UDim2.new(1, 0, 1, 0),
-                                        Position = UDim2.new(0, 0, 0, 0),
+                                        Size = UDim2.new(0, 1, 0, 1),
                                         BackgroundTransparency = 1,
                                         Text = "",
-                                        ZIndex = 10,
-                                        Parent = Lbl.Parent
+                                        ZIndex = 20,
+                                        Parent = MainWindow.TopBar
                                 })
+                                task.defer(function()
+                                        local tb = MainWindow.TopBar
+                                        _ghBtn.Position = UDim2.new(0, _ghPill.AbsolutePosition.X - tb.AbsolutePosition.X, 0, _ghPill.AbsolutePosition.Y - tb.AbsolutePosition.Y)
+                                        _ghBtn.Size = UDim2.new(0, _ghPill.AbsoluteSize.X, 0, _ghPill.AbsoluteSize.Y)
+                                end)
                                 _ghBtn.MouseButton1Up:Connect(function()
                                         if _ghUrl ~= "" and setclipboard then
                                                 setclipboard(_ghUrl)
@@ -1227,25 +1233,31 @@ function Library:MakeWindow(WindowConfig)
                                 end)
                         elseif td.Type == "Discord" then
                                 local _dcUrl = td.Text or ""
-                                Lbl.Text = "Discord"
+                                Lbl.Visible = false
                                 Dot.Visible = false
+                                local _dcPill = Dot.Parent
                                 Create("ImageLabel", {
-                                        Size = UDim2.new(0, 10, 0, 10),
+                                        Size = UDim2.new(0, 14, 0, 14),
                                         BackgroundTransparency = 1,
                                         Image = "rbxassetid://18505728201",
-                                        ImageColor3 = Color3.fromRGB(220, 220, 220),
+                                        ImageColor3 = Color3.fromRGB(225, 225, 225),
                                         ScaleType = Enum.ScaleType.Fit,
-                                        LayoutOrder = 0,
-                                        Parent = Dot.Parent
+                                        LayoutOrder = 1,
+                                        ZIndex = 5,
+                                        Parent = _dcPill
                                 })
                                 local _dcBtn = Create("TextButton", {
-                                        Size = UDim2.new(1, 0, 1, 0),
-                                        Position = UDim2.new(0, 0, 0, 0),
+                                        Size = UDim2.new(0, 1, 0, 1),
                                         BackgroundTransparency = 1,
                                         Text = "",
-                                        ZIndex = 10,
-                                        Parent = Lbl.Parent
+                                        ZIndex = 20,
+                                        Parent = MainWindow.TopBar
                                 })
+                                task.defer(function()
+                                        local tb = MainWindow.TopBar
+                                        _dcBtn.Position = UDim2.new(0, _dcPill.AbsolutePosition.X - tb.AbsolutePosition.X, 0, _dcPill.AbsolutePosition.Y - tb.AbsolutePosition.Y)
+                                        _dcBtn.Size = UDim2.new(0, _dcPill.AbsoluteSize.X, 0, _dcPill.AbsoluteSize.Y)
+                                end)
                                 _dcBtn.MouseButton1Up:Connect(function()
                                         if _dcUrl ~= "" and setclipboard then
                                                 setclipboard(_dcUrl)
@@ -1276,6 +1288,18 @@ function Library:MakeWindow(WindowConfig)
                 end
         end
         -- ── End Tags ──────────────────────────────────────────────────────
+
+        -- ── Viewport-based UIScale ─────────────────────────────────────────
+        local _uiScale = Instance.new("UIScale")
+        _uiScale.Parent = MainWindow
+        local function _applyScale()
+                local vp = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1920, 1080)
+                local s = math.clamp(math.min(vp.X / 1366, vp.Y / 768), 0.55, 1.25)
+                _uiScale.Scale = s
+        end
+        _applyScale()
+        AddConnection(workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"), _applyScale)
+        -- ── End UIScale ────────────────────────────────────────────────────
 
         local MobileReopenButton = SetChildren(SetProps(MakeElement("Button"), {
                 Parent = Container,
