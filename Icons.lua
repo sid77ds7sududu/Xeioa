@@ -1,38 +1,37 @@
 local Icons = {
-    House = { IconId = "rbxassetid://10734882173" },
-    Settings = { IconId = "rbxassetid://10734950309" },
-    Profile = { IconId = "rbxassetid://10723414172" },
-    Search = { IconId = "rbxassetid://10734945412" },
-    Menu = { IconId = "rbxassetid://10723345423" },
+    House     = { IconId = "rbxassetid://7733960981" }, -- Haus-Icon
+    Settings  = { IconId = "rbxassetid://7734053495" }, -- Zahnradsymbol
+    Profile   = { IconId = "rbxassetid://7743875962" }, -- Nutzer-Icon
+    Search    = { IconId = "rbxassetid://7734052925" }, -- Suchsymbol
+    Menu      = { IconId = "rbxassetid://7733993211" }, -- Menü-Icon
 
-    Sword = { IconId = "rbxassetid://10734951437" },
-    Gun = { IconId = "rbxassetid://13834070251" },     -- Custom/Standard-Waffen-Icon
-    Weapon = { IconId = "rbxassetid://10734951437" },  -- Alternativ auch Sword
-    Shield = { IconId = "rbxassetid://10734947231" },
-    Crosshair = { IconId = "rbxassetid://10723348128" },
+    Sword     = { IconId = "" }, -- (eigene Waffe oder anderes Icon nötig)
+    Gun       = { IconId = "" }, -- (eigene Waffe oder anderes Icon nötig)
+    Weapon    = { IconId = "" }, -- (eigene Waffe oder anderes Icon nötig)
+    Shield    = { IconId = "rbxassetid://7734056608" }, -- Schild
+    Crosshair = { IconId = "rbxassetid://7733765307" }, -- Fadenkreuz
 
-    Eye = { IconId = "rbxassetid://10723351944" },
-    User = { IconId = "rbxassetid://10723414172" },
-    Backpack = { IconId = "rbxassetid://10723315750" },
-    Inventory = { IconId = "rbxassetid://10723374246" }, -- Koffer/Paket-Icon
-    Friends = { IconId = "rbxassetid://10723413551" },
+    Eye       = { IconId = "rbxassetid://7733774602" }, -- Auge
+    User      = { IconId = "rbxassetid://7743875962" }, -- Nutzer
+    Backpack  = { IconId = "" }, -- (eigenes Icon)
+    Inventory = { IconId = "" }, -- (eigenes Icon)
+    Friends   = { IconId = "rbxassetid://7743876054" }, -- Freunde/Nutzer
 
-    Coin = { IconId = "rbxassetid://10734898114" },    -- Dollar/Münzen-Symbol
-    Gem = { IconId = "rbxassetid://10734896791" },     -- Diamant-Form
-    Shop = { IconId = "rbxassetid://10734948432" },    -- Einkaufswagen
-    Gift = { IconId = "rbxassetid://10733153573" },
-    Trophy = { IconId = "rbxassetid://10734953716" },
+    Coin     = { IconId = "rbxassetid://7743866529" }, -- Münzen
+    Gem      = { IconId = "rbxassetid://7733942651" }, -- Juwel
+    Shop     = { IconId = "rbxassetid://7734056813" }, -- Einkaufswagen
+    Gift     = { IconId = "rbxassetid://7733946818" }, -- Geschenk
+    Trophy   = { IconId = "rbxassetid://7733673987" }, -- Trophäe/Award
 
-    Star = { IconId = "rbxassetid://10734949856" },
-    Heart = { IconId = "rbxassetid://10723363363" },
-    Bell = { IconId = "rbxassetid://10723318237" },
-    Mail = { IconId = "rbxassetid://10734900767" },
-    Lock = { IconId = "rbxassetid://10734901633" },
-    Unlock = { IconId = "rbxassetid://10734954316" },
-    Warning = { IconId = "rbxassetid://10723415181" },
-    Fire = { IconId = "rbxassetid://10723354325" },
-    Lightning = { IconId = "rbxassetid://10734901140" },
-    Crown = { IconId = "rbxassetid://10734899557" }
+    Star     = { IconId = "rbxassetid://7734068321" }, -- Stern
+    Heart    = { IconId = "rbxassetid://7733956134" }, -- Herz
+    Bell     = { IconId = "rbxassetid://7733911828" }, -- Glocke
+    Mail     = { IconId = "rbxassetid://7733992732" }, -- Briefumschlag
+    Lock     = { IconId = "rbxassetid://7733992528" }, -- Schloss
+    Unlock   = { IconId = "rbxassetid://7743875263" }, -- Entsperrt
+    Warning  = { IconId = "rbxassetid://7733658504" }, -- Achtung/Dreieck
+    Fire     = { IconId = "rbxassetid://7733798747" }, -- Feuerflamme
+    Lightning= { IconId = "rbxassetid://7733771628" }, -- Blitz⚡
+    Crown    = { IconId = "rbxassetid://7733765398" }, -- Krone
 }
-
 return Icons
