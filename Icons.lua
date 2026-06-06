@@ -1,37 +1,64 @@
 local Icons = {
-    House     = { IconId = "rbxassetid://7733960981" }, -- Haus-Icon
-    Settings  = { IconId = "rbxassetid://7734053495" }, -- Zahnradsymbol
-    Profile   = { IconId = "rbxassetid://7743875962" }, -- Nutzer-Icon
-    Search    = { IconId = "rbxassetid://7734052925" }, -- Suchsymbol
-    Menu      = { IconId = "rbxassetid://7733993211" }, -- Menü-Icon
+    House      = { IconId = "7733960981" },
+    Settings   = { IconId = "7734053495" },
+    Profile    = { IconId = "7743875962" },
+    Search     = { IconId = "7734052925" },
+    Menu       = { IconId = "7733993211" },
 
-    Sword     = { IconId = "" }, -- (eigene Waffe oder anderes Icon nötig)
-    Gun       = { IconId = "" }, -- (eigene Waffe oder anderes Icon nötig)
-    Weapon    = { IconId = "" }, -- (eigene Waffe oder anderes Icon nötig)
-    Shield    = { IconId = "rbxassetid://7734056608" }, -- Schild
-    Crosshair = { IconId = "rbxassetid://7733765307" }, -- Fadenkreuz
+    Sword      = { IconId = "" },
+    Gun        = { IconId = "" },
+    Weapon     = { IconId = "7733674079" },
+    Shield     = { IconId = "7734056608" },
+    Crosshair  = { IconId = "7733765307" },
 
-    Eye       = { IconId = "rbxassetid://7733774602" }, -- Auge
-    User      = { IconId = "rbxassetid://7743875962" }, -- Nutzer
-    Backpack  = { IconId = "" }, -- (eigenes Icon)
-    Inventory = { IconId = "" }, -- (eigenes Icon)
-    Friends   = { IconId = "rbxassetid://7743876054" }, -- Freunde/Nutzer
+    Eye        = { IconId = "7733774602" },
+    User       = { IconId = "7743875962" },
+    Backpack   = { IconId = "7734021469" },
+    Inventory  = { IconId = "7733917120" },
+    Friends    = { IconId = "7743876054" },
 
-    Coin     = { IconId = "rbxassetid://7743866529" }, -- Münzen
-    Gem      = { IconId = "rbxassetid://7733942651" }, -- Juwel
-    Shop     = { IconId = "rbxassetid://7734056813" }, -- Einkaufswagen
-    Gift     = { IconId = "rbxassetid://7733946818" }, -- Geschenk
-    Trophy   = { IconId = "rbxassetid://7733673987" }, -- Trophäe/Award
+    Coin       = { IconId = "7743866529" },
+    Gem        = { IconId = "7733942651" },
+    Shop       = { IconId = "7734056813" },
+    Gift       = { IconId = "7733946818" },
+    Trophy     = { IconId = "7733673987" },
 
-    Star     = { IconId = "rbxassetid://7734068321" }, -- Stern
-    Heart    = { IconId = "rbxassetid://7733956134" }, -- Herz
-    Bell     = { IconId = "rbxassetid://7733911828" }, -- Glocke
-    Mail     = { IconId = "rbxassetid://7733992732" }, -- Briefumschlag
-    Lock     = { IconId = "rbxassetid://7733992528" }, -- Schloss
-    Unlock   = { IconId = "rbxassetid://7743875263" }, -- Entsperrt
-    Warning  = { IconId = "rbxassetid://7733658504" }, -- Achtung/Dreieck
-    Fire     = { IconId = "rbxassetid://7733798747" }, -- Feuerflamme
-    Lightning= { IconId = "rbxassetid://7733771628" }, -- Blitz⚡
-    Crown    = { IconId = "rbxassetid://7733765398" }, -- Krone
+    Star       = { IconId = "7734068321" },
+    Heart      = { IconId = "7733956134" },
+    Bell       = { IconId = "7733911828" },
+    Mail       = { IconId = "7733992732" },
+    Lock       = { IconId = "7733992528" },
+    Unlock     = { IconId = "7743875263" },
+    Warning    = { IconId = "7733658504" },
+    Fire       = { IconId = "7733798747" },
+    Lightning  = { IconId = "7733771628" },
+    Crown      = { IconId = "7733765398" },
+
+    Edit       = { IconId = "7733771472" },
+    Save       = { IconId = "" },
+    Play       = { IconId = "7743871480" },
+    Pause      = { IconId = "7734021897" },
+    Check      = { IconId = "7733715400" },
+    Info       = { IconId = "7733964719" },
+    Add        = { IconId = "7734042071" },
+    Minus      = { IconId = "7734000129" },
+    Chat       = { IconId = "7733993311" },
+    Send       = { IconId = "7734053039" },
+    Skull      = { IconId = "7734058599" },
+    ArrowLeft  = { IconId = "7733673136" },
+    ArrowRight = { IconId = "7733673345" },
+    ArrowUp    = { IconId = "7733673717" },
+    ArrowDown  = { IconId = "7733672933" },
+    Compass    = { IconId = "7733924216" },
+    Map        = { IconId = "7733992829" },
+    DollarSign = { IconId = "7733770599" },
+    Banknote   = { IconId = "7733674153" },
+    PiggyBank  = { IconId = "7734034513" },
+    Wallet     = { IconId = "7743877573" },
+    ThumbsUp   = { IconId = "7743873212" },
+    ThumbsDown = { IconId = "7734084236" },
+    Music      = { IconId = "7734020554" },
+    Help       = { IconId = "7733956210" }
 }
+
 return Icons
